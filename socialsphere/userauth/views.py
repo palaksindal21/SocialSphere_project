@@ -86,7 +86,7 @@ def signup(request):
             messages.info(request, 'Password Not Matching.')
             return redirect('settings')
     else:
-        return redirect(request, 'signup.html')
+        return render(request, 'signup.html')
 
 
 def signin(request):
