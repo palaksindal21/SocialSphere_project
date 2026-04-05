@@ -10,7 +10,11 @@ import random
 @login_required(login_url='signin')
 def home(request):
     user_object = User.objects.get(username=request.user.username)
-    user_profile = Profile.objects.get(user=user_object)
+    # user_profile = Profile.objects.get(user=user_object)
+    user_profile = Profile.objects.filter(user=user_object).first()
+
+    if user_profile is None:
+        user_profile = Profile.objects.create(user=user_object, id_user=user_object.id)
 
     user_following_list = []
     feed = []
@@ -146,11 +150,12 @@ def follow(request):
 @login_required(login_url='signin')
 def search(request):
     user_object = User.objects.get(username=request.user.username)
-    user_profile = Profile.objects.get(user=user_object)
+    # user_profile = Profile.objects.get(user=user_object)
+    user_profile = Profile.objects.filter(user=user_object).first()
 
     if request.method == 'POST':
         username = request.POST['username']
-        username_object = User.objects.filter(username__locations=username)
+        username_object = User.objects.filter(username__icontains=username)
 
         username_profile = []
         username_profile_list = []
@@ -163,13 +168,13 @@ def search(request):
             username_profile_list.append(profile_lists)
 
         username_profile_list = list(chain(*username_profile_list))
-    return render(request, 'search.html', {'user_profile':user_profile, 'username_profile_list':username_profile_list})
+    return render(request, 'search.html', {'user_profile':user_profile, 'username_profile_list':username_profile_list, 'username': username})
 
 
 @login_required(login_url='signin')
 def profile(request, pk):
     user_object = User.objects.get(username=pk)
-    user_profile = Profile.objects.get(user=user_object)
+    user_profile = Profile.objects.filter(user=user_object).first()
     user_posts = Post.objects.filter(user=pk)
     user_post_length = len(user_posts)
 
@@ -223,15 +228,15 @@ def like_post(request):
 
 @login_required(login_url='signin')      
 def settings(request):
-    user_profile = Profile.objects.get(user=request.user)
+    user_profile = Profile.objects.filter(user=request.user).first()
 
     if request.method == 'POST':
         if request.FILES.get('image') == None:
-            image = user_profile.profileimage
+            image = request.FILES.get('image') or user_profile.profileimg
             bio = request.POST['bio']
             location = request.POST['location']
 
-            user_profile.profileimage = image
+            user_profile.profileimg = image
             user_profile.bio = bio
             user_profile.location = location
             user_profile.save()
