@@ -9,7 +9,7 @@ import random
 # Create your views here.
 @login_required(login_url='signin')
 def home(request):
-    user_object = User.objects.get(username=request.user.username)
+    user_object = request.user
     # user_profile = Profile.objects.get(user=user_object)
     user_profile = Profile.objects.filter(user=user_object).first()
 
@@ -35,8 +35,11 @@ def home(request):
     user_following_all = []
 
     for user in user_following:
-        user_list = User.objects.get(username=user.user)
-        user_following_all.append(user_list)
+        try:    
+            user_list = User.objects.get(username=user.user)
+            user_following_all.append(user_list)
+        except User.DoesNotExist:
+            continue
 
     new_suggestions_list = [x for x in list(all_users) if (x not in list(user_following_all))]
     current_user = User.objects.filter(username = request.user.username)
@@ -88,7 +91,7 @@ def signup(request):
         
         else:
             messages.info(request, 'Password Not Matching.')
-            return redirect('settings')
+            return redirect('signup')
     else:
         return render(request, 'signup.html')
 
@@ -132,19 +135,21 @@ def upload(request):
 @login_required(login_url='signin')
 def follow(request):
     if request.method == 'POST':
-        follower = request.POST['follower']
-        user = request.POST['user']
+        follower = request.POST.get('follower')
+        user = request.POST.get('user')
+
+        if not follower or not user:              
+           return redirect('/')
 
         if FollowersCount.objects.filter(follower=follower, user=user).first():
            delete_follower = FollowersCount.objects.get(follower=follower, user=user)
            delete_follower.delete()
-           return redirect('/profile/'+user)
+           return redirect('/profile/',pk=user)
         else:
             new_follower = FollowersCount.objects.create(follower=follower, user=user)
             new_follower.save()
-            return redirect('/profile/'+user)
-    else:
-        return redirect('/')
+            return redirect('/profile/', pk=user)
+    return redirect('/')
 
 
 @login_required(login_url='signin')

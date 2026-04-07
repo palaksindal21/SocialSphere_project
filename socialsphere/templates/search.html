@@ -1,21 +1,143 @@
-{% extends 'home.html' %}
+{% load static %}
 
-{% block title %}Search{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'assets/images/favicon.png' %}" rel="icon" type="image/png">
+    <title>Search</title>
 
-<h2>Results for "{{username}}"</h2>
+    <link rel="stylesheet" href="{% static 'assets/css/icons.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/uikit.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/tailwind.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
 
-{% for users in username_profile_list %}
-    <div class="container">
-        <a href="/profile/{{users.user}}">
-            <img src="{{users.profileimg.url}}" width="80">
-        </a>
+<body>
 
-        <p>@{{users.user}}</p>
-        <p>{{users.bio}}</p>
+<header style="margin-top: -23px;">
+    <div class="header_inner">
+        <div class="left-side">
+
+            <!-- SEARCH FORM (FIXED POSITION) -->
+            <form action="{% url 'search' %}" method="POST">
+                {% csrf_token %}
+                <input type="text" name="username" placeholder="Search for username..">
+                <button type="submit"><i class="fa fa-search fa-1x"></i></button>
+            </form>
+
+        </div>
+
+        <div class="right-side lg:pr-4">
+
+            <!-- Welcome -->
+            <a href="#">
+                Welcome <b>{{user.username}}</b>
+            </a>
+
+            <!-- Upload -->
+            <a href="#"
+                class="bg-pink-500 flex font-bold hidden hover:bg-pink-600 hover:text-white inline-block items-center lg:block max-h-10 mr-4 px-4 py-2 rounded shado text-white">
+                <ion-icon name="add-circle" class="-mb-1 mr-1 opacity-90 text-xl uilus-circle"></ion-icon> New Post
+            </a>
+
+            <!-- Upload dropdown -->
+            <div uk-dropdown="pos: top-right;mode:click ; animation: uk-animation-slide-bottom-small" class="header_dropdown">
+
+                <div class="px-4 py-3 -mx-5 -mt-4 mb-5 border-b">
+                    <h4>Upload Pics or Videos</h4>
+                </div>
+
+                <div class="flex justify-center flex-center text-center">
+                    <div class="flex flex-col choose-upload text-center">
+
+                        <div class="bg-gray-100 border-2 border-dashed flex flex-col h-24 items-center justify-center relative w-full rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-12">
+                                <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z" />
+                                <path d="M9 13h2v5a1 1 0 11-2 0v-5z" />
+                            </svg>
+                        </div>
+
+                        <p class="my-3 leading-6">Upload pics ..</p>
+
+                        <!-- FIXED FILE INPUT -->
+                        <input type="file" name="image_upload">
+
+                    </div>
+                </div>
+
+                <div class="px-4 py-3 -mx-5 -mb-4 mt-5 border-t text-sm">
+                    Your File size Must be Maximum 999MB
+                </div>
+            </div>
+
+            <!-- Profile -->
+            <a href="">
+                {% if user_profile.profileimg %}
+                    <img src="{{ user_profile.profileimage.url }}" class="header-avatar" alt="">
+                {% else %}
+                    <img src="{% static 'assets/images/default.png' %}" class="header-avatar" alt="">
+                {% endif %}
+            </a>
+
+            <div uk-drop="mode: click;offset:9" class="header_dropdown profile_dropdown border-t">
+                <ul>
+                    <li><a href="{% url 'settings' %}">Account setting</a></li>
+                    <li><a href="{% url 'logout' %}">Log Out</a></li>
+                </ul>
+            </div>
+
+        </div>
     </div>
-    <hr>
-{% endfor %}
+</header>
 
-{% endblock %}
+<!-- RESULTS -->
+<div style="margin-left: 250px; margin-right: 250px;">
+
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-3 col-md-push-9">
+                <h4>Results For <b>{{username}}</b></h4>
+            </div>
+
+            <div class="col-md-9 col-md-pull-3">
+
+                {% for users in username_profile_list %}
+                <section class="search-result-item">
+                    <a class="image-link" href="{% url 'profile' users.user %}">
+                        <img class="image" src="{{users.profileimage.url}}">
+                    </a>
+
+                    <div class="search-result-item-body">
+                        <h4>
+                            <a href="{% url 'profile' users.user %}">
+                                <b>@{{users.user}}</b>
+                            </a>
+                        </h4>
+                        <p>{{users.location}}</p>
+                        <p>{{users.bio}}</p>
+                    </div>
+                </section>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="{% static 'assets/js/tippy.all.min.js' %}"></script>
+<script src="{% static 'assets/js/jquery-3.3.1.min.js' %}"></script>
+<script src="{% static 'assets/js/uikit.js' %}"></script>
+<script src="{% static 'assets/js/simplebar.js' %}"></script>
+<script src="{% static 'assets/js/custom.js' %}"></script>
+
+<!-- FIXED CDN -->
+<script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
+
+</body>
+</html>
