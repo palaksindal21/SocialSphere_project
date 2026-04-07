@@ -140,16 +140,25 @@ def follow(request):
 
         if not follower or not user:              
            return redirect('/')
-
-        if FollowersCount.objects.filter(follower=follower, user=user).first():
-           delete_follower = FollowersCount.objects.get(follower=follower, user=user)
-           delete_follower.delete()
-           return redirect('/profile/',pk=user)
+        
+        if FollowersCount.objects.filter(follower=follower, user=user).exists():
+            FollowersCount.objects.filter(follower=follower, user=user).delete()
         else:
-            new_follower = FollowersCount.objects.create(follower=follower, user=user)
-            new_follower.save()
-            return redirect('/profile/', pk=user)
+            FollowersCount.objects.create(follower=follower, user=user)
+
+            return redirect('profile', pk=user)
+
     return redirect('/')
+
+    #     if FollowersCount.objects.filter(follower=follower, user=user).first():
+    #        delete_follower = FollowersCount.objects.get(follower=follower, user=user)
+    #        delete_follower.delete()
+    #        return redirect('/profile/',pk=user)
+    #     else:
+    #         new_follower = FollowersCount.objects.create(follower=follower, user=user)
+    #         new_follower.save()
+    #         return redirect('/profile/', pk=user)
+    # return redirect('/')
 
 
 @login_required(login_url='signin')
@@ -179,7 +188,7 @@ def search(request):
 @login_required(login_url='signin')
 def profile(request, pk):
     user_object = User.objects.get(username=pk)
-    user_profile = Profile.objects.filter(user=user_object).first()
+    user_profile = Profile.objects.get(user=user_object)
     user_posts = Post.objects.filter(user=pk)
     user_post_length = len(user_posts)
 
@@ -192,11 +201,11 @@ def profile(request, pk):
     else:
         button_text = 'Follow'
 
-    user_followers = len(FollowersCount.objects.filter(user=pk))
-    user_following = len(FollowersCount.objects.filter(follower=pk))
+    user_followers = FollowersCount.objects.filter(user=pk).count()
+    user_following = FollowersCount.objects.filter(follower=pk).count()
 
     context = {
-        'user_objects': user_object,
+        'user_object': user_object,
         'user_profile': user_profile,
         'user_posts': user_posts,
         'user_post_length': user_post_length,
@@ -237,11 +246,11 @@ def settings(request):
 
     if request.method == 'POST':
         if request.FILES.get('image') == None:
-            image = request.FILES.get('image') or user_profile.profileimg
+            image = request.FILES.get('image') or user_profile.profileimage
             bio = request.POST['bio']
             location = request.POST['location']
 
-            user_profile.profileimg = image
+            user_profile.profileimage = image
             user_profile.bio = bio
             user_profile.location = location
             user_profile.save()

@@ -34,7 +34,7 @@
         <div class="right-side lg:pr-4">
 
             <!-- Welcome -->
-            <a href="#">
+            <a href="{% url 'profile' request.user.username %}">
                 Welcome <b>{{user.username}}</b>
             </a>
 
@@ -65,6 +65,7 @@
 
                         <!-- FIXED FILE INPUT -->
                         <input type="file" name="image_upload">
+                        <input type="submit" value="Upload">
 
                     </div>
                 </div>

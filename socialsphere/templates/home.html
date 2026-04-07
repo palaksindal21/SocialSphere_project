@@ -29,7 +29,7 @@
                         <!-- Logo -->
                         <div id="logo" class=" uk-hidden@s">
                             <a href="{% url 'home' %}">
-                                <b><h1 style="text-transform: uppercase;">Social Book</h1></b>
+                                <b><h1 style="text-transform: uppercase;">SocialSphere</h1></b>
                             </a>
                         </div>
 
@@ -193,6 +193,14 @@
 
                     <!-- left sidebar-->
                     <div class="space-y-5 flex-shrink-0 lg:w-7/12">
+                        <div class="bg-white p-4 rounded shadow mb-4">
+                           <form action="{% url 'upload' %}" method="POST" enctype="multipart/form-data">
+                                  {% csrf_token %}
+                                <input type="file" name="image_upload" required><br><br>
+                                <textarea name="caption" placeholder="Write caption..."></textarea><br><br>
+                                <button type="submit">Post</button>
+                            </form>
+                         </div>
 
                         <!-- post 1-->
 
