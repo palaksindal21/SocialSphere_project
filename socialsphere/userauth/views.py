@@ -20,7 +20,8 @@ def home(request):
     feed = []
 
     user_following = FollowersCount.objects.filter(follower=request.user.username)
-
+    user_followers = FollowersCount.objects.filter(user=request.user.username).count()
+    user_following_count = FollowersCount.objects.filter(follower=request.user.username).count()
     for users in user_following:
         user_following_list.append(users.user)
 
@@ -58,7 +59,7 @@ def home(request):
 
     suggestions_username_profile_list = list(chain(*username_profile_list))
 
-    return render(request, 'home.html', {'user_profile': user_profile, 'posts': feed_list, 'suggestions_username_profile_list':suggestions_username_profile_list[::4]})
+    return render(request, 'home.html', {'user_profile': user_profile, 'posts': feed_list, 'suggestions_username_profile_list':suggestions_username_profile_list[::4], 'user_followers': user_followers,  'user_following': user_following_count})
 
 
 def signup(request):
