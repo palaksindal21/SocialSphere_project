@@ -42,3 +42,41 @@ class FollowersCount(models.Model):
 
     def __str__(self):
         return self.user
+
+
+class Comment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='comments')
+    user = models.CharField(max_length=100)
+    text = models.TextField(max_length=800)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, related_name='replies')
+    created_at = models.DateTimeField(default=datetime.now)
+    is_deleted = models.BooleanField(default=False)
+    likes = models.ManyToManyField(User, related_name='liked_comments', blank=True)
+
+    def __str__(self):
+        return f"{self.user} on {self.post.id}"
+    
+    @property
+    def like_count(self):
+        return self.likes.count()
+    
+    @property
+    def reply_count(self):
+        return self.replies.filter(is_deleted=False).count()
+
+
+class SavedPost(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='saved_by')
+    user = models.CharField(max_length=100)
+    saved_at = models.DateTimeField(default=datetime.now)
+
+    class Meta:
+        unique_together = ('post', 'user') #prevent duplicate saves
+
+    def __str__(self):
+        return f"{self.user} saved {self.post.id}"
+    
+
+    

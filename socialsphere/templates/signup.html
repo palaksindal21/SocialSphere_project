@@ -1,156 +1,231 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
-
-
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="{% static 'assets/images/favicon.png' %}" rel="icon" type="image/png">
     <title>Sign Up - SocialSphere</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{% static 'assets/css/icons.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/uikit.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/tailwind.css' %}">
 
+    <link href="{% static 'assets/images/favicon.png' %}" rel="icon">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
-<body class="bg-gray-100">
+<body>
 
+<!-- NAVBAR -->
+<nav>
+    <h2 class="logo">SocialSphere</h2>
 
-    <div id="wrapper" class="flex flex-col justify-between h-screen">
+    <div class="nav-links">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="#">Features</a>
+        <a href="#">About</a>
+    </div>
 
-        <!-- header-->
-        <div class="bg-white py-4 shadow dark:bg-gray-800">
-            <div class="max-w-6xl mx-auto">
+    <div class="auth">
+        <button onclick="location.href="{% url 'signin' %}"">Login</button>
+    </div>
+</nav>
 
+<!-- SIGNUP -->
+<section class="auth-section">
+    <div class="auth-container">
 
-                <div class="flex items-center lg:justify-between justify-around">
-
-                    <a href="{% url 'home' %}">
-                        <b><h1 style="font-size: 1.5rem;">SocialSphere</h1></b>
-                    </a>
-
-                    <div class="capitalize flex font-semibold hidden lg:block my-2 space-x-3 text-center text-sm">
-                        
-                        <a href="{% url 'signin' %}" class="bg-pink-500 pink-500 px-6 py-3 rounded-md shadow text-white">Login</a>
-                    </div>
-
-                </div>
-            </div>
+        <!-- HEADER -->
+        <div class="auth-header">
+            <i class="fas fa-user-plus"></i>
+            <h2>Create Account</h2>
+            <p>Join the SocialSphere community</p>
         </div>
 
-        <!-- Content-->
+        <!-- MESSAGE -->
+        <div id="messageBox" class="error-message"></div>
 
-        <div>
-            <div class="lg:p-12 max-w-md max-w-xl lg:my-0 my-12 mx-auto p-6 space-y-4">
-                <h1 class="lg:text-3xl text-xl font-semibold mb-6"> Sign Up</h1>
-                <!--<p class="mb-2 text-black text-lg"> Register to manage your account </p>-->
-                
+        <!-- FORM -->
+        <form id="signupForm">
 
-                <div>
-                    <style>
-                        h5{
-                            color: red;
-                        }
-                    </style>
-                    {% for message in messages %}
-                    <h5>{{message}}</h5>
-                    {% endfor %}
-                </div>
-                
-                
-                <form action="{% url 'signup' %}" method="POST">
-                    {% csrf_token %}
-                    <!--<div class="flex lg:flex-row flex-col lg:space-x-2">
-                        <input type="text" placeholder="First Name"  class="bg-gray-200 mb-2 shadow-none  dark:bg-gray-800" style="border: 1px solid #d3d5d8 !important;">
-                        <input type="text" placeholder="Last Name" class="bg-gray-200 mb-2 shadow-none  dark:bg-gray-800" style="border: 1px solid #d3d5d8 !important;">
-                    </div>-->
-                    <input type="text" name="username" placeholder="Username" class="bg-gray-200 mb-2 shadow-none  dark:bg-gray-800" style="border: 1px solid #d3d5d8 !important;">
-                    <input type="email" name="email" placeholder="Email" class="bg-gray-200 mb-2 shadow-none  dark:bg-gray-800" style="border: 1px solid #d3d5d8 !important;">
-                    <input type="password" name="password" placeholder="Password" class="bg-gray-200 mb-2 shadow-none  dark:bg-gray-800" style="border: 1px solid #d3d5d8 !important;">
-                    <input type="password" name="password2" placeholder="Confirm Password" class="bg-gray-200 mb-2 shadow-none  dark:bg-gray-800" style="border: 1px solid #d3d5d8 !important;">
-                    <!-- <div class="flex justify-start my-4 space-x-1">
-                        <div class="checkbox">
-                            <input type="checkbox" id="chekcbox1" checked>
-                            <label for="chekcbox1"><span class="checkbox-icon"></span> I Agree</label>
-                        </div>
-                        <a href="#"> Terms and Conditions</a>
-                    </div> -->
-                    <button type="submit" class="bg-gradient-to-br from-pink-500 py-3 rounded-md text-white text-xl to-red-400 w-full">Sign Up</button>
-                    <div class="text-center mt-5 space-x-2">
-                        <p class="text-base"> Do you have an account? <a href="{% url 'signin' %}"> Login </a></p>
-                    </div>
-                </form>
+            {% csrf_token %}
 
-
-
+            <!-- USERNAME -->
+            <div class="input-group">
+                <i class="fas fa-at"></i>
+                <input type="text" name="username" id="username"
+                    placeholder="Username" required>
+                <small class="input-hint">letters, numbers, underscore</small>
             </div>
-        </div>
-        
-        <!-- Footer -->
 
-        <div class="lg:mb-5 py-3 uk-link-reset">
-            <div class="flex flex-col items-center justify-between lg:flex-row max-w-6xl mx-auto lg:space-y-0 space-y-3">
-                <div class="flex space-x-2 text-gray-700 uppercase">
-                    
+            <!-- EMAIL -->
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" name="email" id="email"
+                    placeholder="Email Address" required>
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="password" id="password"
+                    placeholder="Password" required>
+                <i class="fas fa-eye-slash toggle-password"
+                    onclick="togglePassword('password')"></i>
+            </div>
+
+            <div id="passwordStrength" class="password-strength"></div>
+
+            <!-- CONFIRM PASSWORD -->
+            <div class="input-group">
+                <i class="fas fa-check-circle"></i>
+                <input type="password" name="password2" id="confirmPassword"
+                    placeholder="Confirm Password" required>
+                <i class="fas fa-eye-slash toggle-password"
+                    onclick="togglePassword('confirmPassword')"></i>
+            </div>
+
+            <!-- TERMS -->
+            <div class="terms-checkbox">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="terms" required>
+                    <span>I agree to Terms & Privacy Policy</span>
+                </label>
+            </div>
+
+            <!-- CAPTCHA -->
+            <div class="captcha-container">
+                <div class="captcha-box">
+                    <div id="captchaCode" class="captcha-code">A3F8G9H2</div>
+                    <button type="button" class="refresh-captcha"
+                        onclick="refreshCaptcha()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+
+                <div class="input-group captcha-input">
+                    <i class="fas fa-shield-alt"></i>
+                    <input type="text" id="captchaInput"
+                        placeholder="Enter CAPTCHA" required>
                 </div>
             </div>
+
+            <!-- BUTTON -->
+            <button type="submit" class="auth-btn">
+                Create Account
+            </button>
+
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account?
+                <a href="{% url 'signin' %}">Login</a>
+            </p>
         </div>
 
     </div>
+</section>
 
-    <!--<script>
-        
-        (function (window, document, undefined) {
-            'use strict';
-            if (!('localStorage' in window)) return;
-            var nightMode = localStorage.getItem('gmtNightMode');
-            if (nightMode) {
-                document.documentElement.className += ' dark';
-            }
-        })(window, document);
-    
-    
-        (function (window, document, undefined) {
-    
-            'use strict';
-    
-            // Feature test
-            if (!('localStorage' in window)) return;
-    
-            // Get our newly insert toggle
-            var nightMode = document.querySelector('#night-mode');
-            if (!nightMode) return;
-    
-            // When clicked, toggle night mode on or off
-            nightMode.addEventListener('click', function (event) {
-                event.preventDefault();
-                document.documentElement.classList.toggle('dark');
-                if (document.documentElement.classList.contains('dark')) {
-                    localStorage.setItem('gmtNightMode', true);
-                    return;
-                }
-                localStorage.removeItem('gmtNightMode');
-            }, false);
-    
-        })(window, document);
-    </script>-->
+<footer>
+    <p>© 2026 SocialSphere</p>
+</footer>
 
-    <!-- Scripts
-    ================================================== -->
-    <script src="{% static 'assets/js/tippy.all.min.js' %}"></script>
-    <script src="{% static 'assets/js/jquery-3.3.1.min.js' %}"></script>
-    <script src="{% static 'assets/js/uikit.js' %}"></script>
-    <script src="{% static 'assets/js/simplebar.js' %}"></script>
-    <script src="{% static 'assets/js/custom.js' %}"></script>
+<!-- JS -->
+<script>
 
+// Toggle Password
+function togglePassword(id) {
+    let input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+}
+
+// Password Strength
+document.getElementById('password').addEventListener('input', function () {
+    const val = this.value;
+    const div = document.getElementById('passwordStrength');
+
+    let strength = 0;
+    if (val.length >= 8) strength++;
+    if (/[A-Z]/.test(val) && /[a-z]/.test(val)) strength++;
+    if (/[0-9]/.test(val)) strength++;
+    if (/[^A-Za-z0-9]/.test(val)) strength++;
+
+    const text = ['Weak', 'Fair', 'Good', 'Strong'];
+    const color = ['#ef4444', '#f59e0b', '#eab308', '#10b981'];
+
+    div.innerHTML = val ?
+        `Strength: <span style="color:${color[strength-1]}">${text[strength-1] || 'Very Weak'}</span>` : '';
+});
+
+// CAPTCHA
+function refreshCaptcha() {
+    document.getElementById('captchaCode').innerText =
+        Math.random().toString(36).substring(2, 10).toUpperCase();
+}
+
+// AJAX SUBMIT
+document.getElementById('signupForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const pass = document.getElementById('password').value;
+    const confirm = document.getElementById('confirmPassword').value;
+    const captchaInput = document.getElementById('captchaInput').value;
+    const captchaCode = document.getElementById('captchaCode').innerText;
+
+    const messageBox = document.getElementById('messageBox');
+
+    // Validation
+    if (pass !== confirm) {
+        showMessage("Passwords do not match", "error");
+        return;
+    }
+
+    if (captchaInput !== captchaCode) {
+        showMessage("Invalid CAPTCHA", "error");
+        refreshCaptcha();
+        return;
+    }
+
+    // AJAX CALL
+    fetch("{% url 'signup' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            password: pass,
+            password2: confirm
+        })
+    })
+    .then(res => res.text())
+    .then(data => {
+        showMessage("Account created successfully!", "success");
+        setTimeout(() => {
+            window.location.href = "{% url 'signin' %}";
+        }, 1500);
+    })
+    .catch(() => {
+        showMessage("Something went wrong!", "error");
+    });
+
+});
+
+// Message UI
+function showMessage(msg, type) {
+    const box = document.getElementById('messageBox');
+    box.style.display = "block";
+    box.innerText = msg;
+
+    if (type === "success") {
+        box.style.background = "#10b981";
+    } else {
+        box.style.background = "#ef4444";
+    }
+}
+
+</script>
 
 </body>
-
-
 </html>

@@ -1,152 +1,288 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="{% static 'assets/images/favicon.png' %}" rel="icon" type="image/png">
-    <title>Settings</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{% static 'assets/css/icons.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/uikit.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/tailwind.css' %}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings - SocialSphere</title>
 
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+
+/* MAIN LAYOUT */
+.settings-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+/* CARD */
+.setting-card {
+    background: #111;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 20px rgba(230,7,150,0.2);
+}
+
+/* HEADINGS */
+.setting-card h3 {
+    margin-bottom: 15px;
+}
+
+/* INPUTS */
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    background: #1c1c1c;
+    color: white;
+}
+
+/* BUTTONS */
+.btn-primary {
+    background: linear-gradient(to right, #e60073, #ff4d4d);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+}
+
+.btn-outline {
+    border: 1px solid #888;
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+}
+
+.danger-btn {
+    background: red;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+}
+
+/* FLEX */
+.toggle-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+/* SWITCH */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+.switch input {display:none;}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  background: #ccc;
+  border-radius: 20px;
+  top:0; left:0; right:0; bottom:0;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px; width: 14px;
+  left: 3px; bottom: 3px;
+  background: white;
+  transition: .4s;
+}
+input:checked + .slider {
+  background: #e60073;
+}
+input:checked + .slider:before {
+  transform: translateX(18px);
+}
+
+/* TOAST */
+#toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #111;
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: none;
+}
+
+</style>
 </head>
 
 <body>
-     <div class="container m-auto"> 
 
-                <h1 class="text-2xl leading-none text-gray-900 tracking-tight mt-3"><a href="{% url 'home' %}">Home</a> / Account Setting for <b>{{user.username}}</b> </h1>
-                <!-- <ul class="mt-5 -mr-3 flex-nowrap lg:overflow-hidden overflow-x-scroll uk-tab">
-                    <li class="uk-active"><a href="#">General</a></li>
-                    <li><a href="#">Profile</a></li>
-                    <li><a href="#">Privacy</a></li>
-                    <li><a href="#">Notification</a></li>
-                    <li><a href="#">Social links</a></li>
-                    <li><a href="#">Billing</a></li>
-                    <li><a href="#">Security</a></li>
-                </ul> -->
-                <br>
-                <hr>
-                <div class="grid lg:grid-cols-3 mt-12 gap-8">
-                    <div>
-                        <h3 class="text-xl mb-2"> General</h3>
-                        <p></p>
-                    </div>
-                    <div class="bg-white rounded-md lg:shadow-lg shadow col-span-2">
-                        
-                    <form action="{% url 'settings' %}" method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                       <div class="grid grid-cols-2 gap-3 lg:p-6 p-4">
-                           
-                           
-                            <div class="col-span-2">
-                                <label for=""> Profile Image</label>
-                                <img width="100" height="100" src="{{ user_profile.profileimage.url|default:'/static/default.png' }}" />
-                                <input type="file" name="image" value="" class="shadow-none bg-gray-100">
-                            </div>
-                            <div class="col-span-2">
-                                <label for="about">Bio</label>  
-                                <textarea id="about" name="bio" rows="3"  class="shadow-none bg-gray-100">{{user_profile.bio}}</textarea>
-                            </div> 
-                            <div class="col-span-2">
-                                <label for=""> Location</label>
-                                <input type="text" name="location" value="{{user_profile.location}}" class="shadow-none bg-gray-100">
-                            </div>
-                            
-                       </div> 
-    
-                       <div class="bg-gray-10 p-6 pt-0 flex justify-end space-x-3">
-                           <a href="{% url 'home' %}" class="p-2 px-4 rounded bg-gray-50 text-red-500">Cancel</a>
-                           <button type="submit" class="button bg-blue-700"> Save </button>
-                       </div>
-                    </form>
-    
-                    </div>
+<nav>
+    <h2 class="logo">SocialSphere</h2>
+</nav>
 
-                    <!-- <div>
-                        <h3 class="text-xl mb-2"> Privacy</h3>
-                        <p> </p>
-                    </div>
-                    <div class="bg-white rounded-md lg:shadow-lg shadow lg:p-6 p-4 col-span-2">
+<div class="settings-container">
 
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <h4> Who can follow me ?</h4>
-                                <div>  </div>
-                            </div>
-                            <div class="switches-list -mt-8 is-large">
-                                <div class="switch-container">
-                                    <label class="switch"><input type="checkbox"><span class="switch-button"></span> </label>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <h4> Show my activities ?</h4>
-                                <div>  </div>
-                            </div>
-                            <div class="switches-list -mt-8 is-large">
-                                <div class="switch-container">
-                                    <label class="switch"><input type="checkbox" checked><span class="switch-button"></span> </label>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <h4> Search engines?</h4>
-                                <div>  </div>
-                            </div>
-                            <div class="switches-list -mt-8 is-large">
-                                <div class="switch-container">
-                                    <label class="switch"><input type="checkbox"><span class="switch-button"></span> </label>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <h4> Allow Commenting?</h4>
-                                <div>  </div>
-                            </div>
-                            <div class="switches-list -mt-8 is-large">
-                                <div class="switch-container">
-                                    <label class="switch"><input type="checkbox"><span class="switch-button"></span> </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
-    
-                    </div>
-                    <br>
+<form method="POST" action="{% url 'settings' %}">
+{% csrf_token %}
 
-                </div>
+<!-- PROFILE -->
+<div class="setting-card">
+<h3><i class="fas fa-user"></i> Profile</h3>
 
-            </div>
-            
-        </div>
+<input type="text" name="username" value="{{ user.username }}" placeholder="Username">
+<textarea name="bio">{{ user_profile.bio }}</textarea>
+<input type="text" name="location" value="{{ user_profile.location }}" placeholder="Location">
+<input type="url" name="website" value="{{ user_profile.website }}" placeholder="Website">
 
-    </div>
+<img src="{{ user_profile.profileimage.url }}" width="80">
 
+<button class="btn-primary">Save Profile</button>
+</div>
 
-    
+<!-- PRIVACY -->
+<div class="setting-card">
+<h3><i class="fas fa-lock"></i> Privacy</h3>
 
- <!-- Scripts
-    ================================================== -->
-    <script src="{% static 'assets/js/tippy.all.min.js' %}"></script>  
-    <script src="{% static 'assets/js/jquery-3.3.1.min.js' %}"></script>
-    <script src="{% static 'assets/js/uikit.js' %}"></script>
-    <script src="{% static 'assets/js/simplebar.js' %}"></script>
-    <script src="{% static 'assets/js/custom.js' %}"></script>
+<div class="toggle-item">
+<span>Private Account</span>
+<label class="switch">
+<input type="checkbox" name="is_private" {% if user_profile.is_private %}checked{% endif %}>
+<span class="slider"></span>
+</label>
+</div>
 
+<div class="toggle-item">
+<span>Show Activity Status</span>
+<label class="switch">
+<input type="checkbox" name="activity_status" checked>
+<span class="slider"></span>
+</label>
+</div>
 
-    <script src="{% static '../../unpkg.com/ionicons%405.2.3/dist/ionicons.js' %}"></script>
+</div>
+
+<!-- SECURITY -->
+<div class="setting-card">
+<h3><i class="fas fa-shield-alt"></i> Security</h3>
+
+<input type="password" name="new_password" placeholder="New Password">
+
+<div class="toggle-item">
+<span>Two-Factor Authentication</span>
+<label class="switch">
+<input type="checkbox">
+<span class="slider"></span>
+</label>
+</div>
+
+</div>
+
+<!-- AGE + TIME -->
+<div class="setting-card">
+<h3><i class="fas fa-user-clock"></i> Age & Usage</h3>
+
+<input type="date" id="birthDate" value="{{ user_profile.birthdate }}">
+
+<div class="toggle-item">
+<span>Daily Limit (2 hours)</span>
+<label class="switch">
+<input type="checkbox">
+<span class="slider"></span>
+</label>
+</div>
+
+</div>
+
+<!-- NOTIFICATIONS -->
+<div class="setting-card">
+<h3><i class="fas fa-bell"></i> Notifications</h3>
+
+<div class="toggle-item"><span>Likes</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+<div class="toggle-item"><span>Comments</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+<div class="toggle-item"><span>Follows</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+<div class="toggle-item"><span>Messages</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+<div class="toggle-item"><span>Shares</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+
+</div>
+
+<!-- BLOCK USERS -->
+<div class="setting-card">
+<h3><i class="fas fa-ban"></i> Blocked Users</h3>
+
+{% for blocked in blocked_users %}
+<div class="toggle-item">
+<span>@{{ blocked.user.username }}</span>
+<button type="button" class="danger-btn" onclick="unblockUser('{{ blocked.user.username }}')">Unblock</button>
+</div>
+{% endfor %}
+
+</div>
+
+<!-- SAVED POSTS -->
+<div class="setting-card">
+<h3><i class="fas fa-bookmark"></i> Saved Posts</h3>
+<a href="{% url 'saved_posts' %}" class="btn-primary">View Saved</a>
+</div>
+
+<!-- DELETE ACCOUNT -->
+<div class="setting-card">
+<h3><i class="fas fa-trash"></i> Delete Account</h3>
+
+<p>⚠️ Permanent deletion. Recover within 30 days.</p>
+<button type="button" class="danger-btn">Delete Account</button>
+
+</div>
+
+</form>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+
+// AGE VALIDATION
+document.getElementById('birthDate').addEventListener('change', function(){
+    let birth = new Date(this.value);
+    let today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+
+    if(age < 15){
+        showToast("Minimum age is 15");
+        this.value = "";
+    }
+});
+
+// UNBLOCK USER
+function unblockUser(username){
+    fetch("/unblock/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "username=" + username
+    })
+    .then(()=> showToast("User unblocked"));
+}
+
+// TOAST
+function showToast(msg){
+    let toast = document.getElementById("toast");
+    toast.innerText = msg;
+    toast.style.display = "block";
+
+    setTimeout(()=> toast.style.display = "none", 2000);
+}
+
+</script>
+
 </body>
-
 </html>

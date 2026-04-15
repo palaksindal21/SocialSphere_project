@@ -1,12 +1,19 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from itertools import chain
 from django.contrib.auth.decorators import login_required
-from . models import Profile, Post, LikePost, FollowersCount
+from . models import *
 import random
 # Create your views here.
+
+def landing(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    
+    return render(request, 'landing.html')
+
 @login_required(login_url='signin')
 def home(request):
     user_object = request.user
@@ -22,6 +29,7 @@ def home(request):
     user_following = FollowersCount.objects.filter(follower=request.user.username)
     user_followers = FollowersCount.objects.filter(user=request.user.username).count()
     user_following_count = FollowersCount.objects.filter(follower=request.user.username).count()
+    user_posts_count = Post.objects.filter(user=request.user.username).count()
     for users in user_following:
         user_following_list.append(users.user)
 
@@ -59,7 +67,10 @@ def home(request):
 
     suggestions_username_profile_list = list(chain(*username_profile_list))
 
-    return render(request, 'home.html', {'user_profile': user_profile, 'posts': feed_list, 'suggestions_username_profile_list':suggestions_username_profile_list[::4], 'user_followers': user_followers,  'user_following': user_following_count})
+    return render(request, 'home.html', {'user_profile': user_profile,
+                                        'posts': feed_list, 'suggestions_username_profile_list':suggestions_username_profile_list[:5],
+                                        'user_followers': user_followers,  'user_following': user_following_count,
+                                        'user_posts_count': user_posts_count})
 
 
 def signup(request):
@@ -259,4 +270,191 @@ def settings(request):
         return redirect('settings')
     return render(request, 'settings.html', {'user_profile':user_profile})
 
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.method == 'POST':
+        comment_text = request.POST.get('comment_text')
+
+        if comment_text:
+            Comment.objects.create(post=post, user=request.user.username, text=comment_text)
+            messages.success(request, "Comment added successfully!!")
+        else:
+            messages.error(request, "Comment cannot be empty!!")
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+@login_required
+def add_reply(request, comment_id):
+    parent_comment = get_object_or_404(Comment, id=comment_id)
+
+    if request.method == 'POST':
+        reply_text = request.POST.get('reply_text')
+
+        if reply_text:
+            Comment.objects.create(post=parent_comment.post, user=request.user.username, text=reply_text, parent=parent_comment)
+            messages.success(request, "Reply added successfully!!")
+        else:
+            messages.error(request, "Reply can not be empty!!")
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    if comment.user == request.user.username:
+        comment.is_deleted = True
+        comment.save()
+        messages.success(request, "Comment deleted successfully!!")
+    else:
+        messages.error(request,"You can not delete someone else's comment")
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+@login_required
+def view_comments(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    comments = Comment.objects.filter(
+        post=post,
+        parent=None,
+        is_deleted=False
+    ).order_by('-created_at')
     
+    for comment in comments:
+        comment.replies_list = Comment.objects.filter(
+            parent=comment,
+            is_deleted=False
+        ).order_by('created_at')
+    
+    return render(request, 'view_comments.html', {
+        'post': post,
+        'comments': comments
+    })
+
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == 'POST':
+        comment_text = request.POST.get('comment_text')
+
+        if comment_text and comment_text.strip():
+            Comment.objects.create(
+                post=post,
+                user=request.user.username,
+                text=comment_text.strip()
+            )
+            messages.success(request, 'Comment added successfully!')
+        else:
+            messages.error(request, 'Comment cannot be empty!')
+    
+    return redirect('view_comments', post_id=post.id)
+
+
+@login_required
+def add_reply(request, comment_id):
+    parent_comment = get_object_or_404(Comment, id=comment_id)
+    if request.method == 'POST':
+        reply_text = request.POST.get('reply_text')
+        
+        if reply_text and reply_text.strip():
+            Comment.objects.create(
+                post=parent_comment.post,
+                user=request.user.username,
+                text=reply_text.strip(),
+                parent=parent_comment
+            )
+            messages.success(request, 'Reply added successfully!')
+        else:
+            messages.error(request, 'Reply cannot be empty!')
+    
+    return redirect('view_comments', post_id=parent_comment.post.id)
+
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    post_id = comment.post.id
+    if comment.user == request.user.username:
+        comment.is_deleted = True
+        comment.save()
+        messages.success(request, 'Comment deleted successfully!')
+    else:
+        messages.error(request, "You can't delete someone else's comment!")
+    
+    return redirect('view_comments', post_id=post_id)
+
+
+@login_required
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    if comment.user != request.user.username:
+        messages.error(request, "You can't edit someone else's comment!")
+        return redirect('view_comments', post_id=comment.post.id)
+    
+    if comment.is_deleted:
+        messages.error(request, "Cannot edit a deleted comment!")
+        return redirect('view_comments', post_id=comment.post.id)
+    
+    if request.method == 'POST':
+        new_text = request.POST.get('comment_text')
+        
+        if new_text and new_text.strip():
+            comment.text = new_text.strip()
+            comment.save()
+            messages.success(request, 'Comment updated successfully!')
+            return redirect('view_comments', post_id=comment.post.id)
+        else:
+            messages.error(request, 'Comment cannot be empty!')
+    
+    return render(request, 'edit_comment.html', {
+        'comment': comment,
+        'post': comment.post
+    })
+
+# save unsave post
+@login_required
+def save_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id, is_deleted=False)
+    saved = SavedPost.objects.filter(post=post, user=request.user.username).first()
+
+    if saved:
+        saved.delete()
+        messages.success(request, "Post removed from saved!!")
+        is_saved = False
+
+    else:
+        SavedPost.objects.create(post=post, user=request.user.username)
+        messages.success(request, "Post saved successfully!!")
+        is_saved = True
+
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+# view saved posts
+@login_required
+def saved_posts(request):
+    user_profile = Profile.objects.filter(user=request.user).first()
+    if not user_profile:
+        user_profile = Profile.objects.create(
+            user=request.user,
+            id_user=request.user.id
+        )
+
+    saved_items = SavedPost.objects.filter(
+        user=request.user.username  # Filter by username string
+    ).select_related('post').order_by('-saved_at')
+
+    saved_posts = []
+    for item in saved_items:
+        if not item.post.is_deleted:
+            saved_posts.append(item.post)
+    
+    context = {
+        'user_profile': user_profile,
+        'saved_posts': saved_posts,
+        'saved_count': len(saved_posts)
+    }
+    
+    return render(request, 'saved_posts.html', context)

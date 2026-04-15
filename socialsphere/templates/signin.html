@@ -1,148 +1,180 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
-
-
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="{% static 'assets/images/favicon.png' %}" rel="icon" type="image/png">
-    <title>Sign In - SocialSphere</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{% static 'assets/css/icons.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/uikit.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/tailwind.css' %}">
+    <title>Login - SocialSphere</title>
 
+    <link href="{% static 'assets/images/favicon.png' %}" rel="icon">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
-<body class="bg-gray-100">
+<body>
 
+<nav>
+    <h2 class="logo">SocialSphere</h2>
 
-    <div id="wrapper" class="flex flex-col justify-between h-screen">
+    <div class="nav-links">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="#">Features</a>
+        <a href="#">About</a>
+    </div>
 
-        <!-- header-->
-        <div class="bg-white py-4 shadow dark:bg-gray-800">
-            <div class="max-w-6xl mx-auto">
+    <div class="auth">
+        <button onclick="location.href='{% url 'signup' %}'">Register</button>
+    </div>
+</nav>
 
+<section class="auth-section">
+    <div class="auth-container">
 
-                <div class="flex items-center lg:justify-between justify-around">
-
-                    <a href="{% url 'home' %}">
-                       <b><h1 style="font-size: 1.5rem;">SocialSphere</h1></b>
-                    </a>
-
-                    <div class="capitalize flex font-semibold hidden lg:block my-2 space-x-3 text-center text-sm">
-                        
-                        <a href="{% url 'signup' %}" class="bg-pink-500 pink-500 px-6 py-3 rounded-md shadow text-white">Register</a>
-                    </div>
-
-                </div>
-            </div>
+        <div class="auth-header">
+            <i class="fas fa-sign-in-alt"></i>
+            <h2>Welcome Back</h2>
+            <p>Login to continue</p>
         </div>
 
-        <!-- Content-->
-        <div>
-            <div class="lg:p-12 max-w-md max-w-xl lg:my-0 my-12 mx-auto p-6 space-y-4">
-                <h1 class="lg:text-3xl text-xl font-semibold  mb-6"> Log in</h1>
+        <div id="messageBox" class="error-message"></div>
 
+        <form id="loginForm">
+            {% csrf_token %}
 
-                <div>
-                    <style>
-                        h5{
-                            color: red;
-                        }
-                    </style>
-                    {% for message in messages %}
-                    <h5>{{message}}</h5>
-                    {% endfor %}
+            <!-- USERNAME -->
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" name="username" id="username"
+                    placeholder="Username" required>
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="password" id="password"
+                    placeholder="Password" required>
+                <i class="fas fa-eye-slash toggle-password"
+                    onclick="togglePassword('password')"></i>
+            </div>
+
+            <!-- CAPTCHA -->
+            <div class="captcha-container">
+                <div class="captcha-box">
+                    <div id="captchaCode" class="captcha-code">A3F8G9H2</div>
+                    <button type="button" class="refresh-captcha"
+                        onclick="refreshCaptcha()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
                 </div>
 
-
-                <form action="{% url 'signin' %}" method="POST">
-                    {% csrf_token %}
-                    <input type="text" name="username" placeholder="Username" class="bg-gray-200 mb-2 shadow-none dark:bg-gray-800" style="border: 1px solid #d3d5d8 !important;">
-                    <input type="password" name="password" placeholder="Password" class="bg-gray-200 mb-2 shadow-none dark:bg-gray-800" style="border: 1px solid #d3d5d8 !important;">
-                    <!-- <div class="flex justify-between my-4">
-                        <div class="checkbox">
-                            <input type="checkbox" id="chekcbox1" checked>
-                            <label for="chekcbox1"><span class="checkbox-icon"></span>Remember Me</label>
-                        </div>
-                        <a href="#"> Forgot Your Password? </a>
-                    </div> -->
-                    <button type="submit" class="bg-gradient-to-br from-pink-500 py-3 rounded-md text-white text-xl to-red-400 w-full">Login</button>
-                    <div class="text-center mt-5 space-x-2">
-                        <p class="text-base"> Not registered? <a href="{% url 'signup' %}" class=""> Create a account </a></p>
-                    </div>
-                </form>
-
-
-
-            </div>
-        </div>
-        
-        <!-- Footer -->
-
-        <div class="lg:mb-5 py-3 uk-link-reset">
-            <div class="flex flex-col items-center justify-between lg:flex-row max-w-6xl mx-auto lg:space-y-0 space-y-3">
-                <div class="flex space-x-2 text-gray-700 uppercase">
+                <div class="input-group captcha-input">
+                    <i class="fas fa-shield-alt"></i>
+                    <input type="text" id="captchaInput"
+                        placeholder="Enter CAPTCHA" required>
                 </div>
             </div>
+
+            <!-- OPTIONS -->
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox"> Remember Me
+                </label>
+                <a href="#" class="forgot-link">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="auth-btn">
+                Login
+            </button>
+
+        </form>
+
+        <div class="auth-footer">
+            <p>Not registered?
+                <a href="{% url 'signup' %}">Create account</a>
+            </p>
         </div>
 
     </div>
+</section>
 
+<footer>
+    <p>© 2026 SocialSphere</p>
+</footer>
 
-    <!--<script>
-        
-        (function (window, document, undefined) {
-            'use strict';
-            if (!('localStorage' in window)) return;
-            var nightMode = localStorage.getItem('gmtNightMode');
-            if (nightMode) {
-                document.documentElement.className += ' dark';
-            }
-        })(window, document);
-    
-    
-        (function (window, document, undefined) {
-    
-            'use strict';
-    
-            // Feature test
-            if (!('localStorage' in window)) return;
-    
-            // Get our newly insert toggle
-            var nightMode = document.querySelector('#night-mode');
-            if (!nightMode) return;
-    
-            // When clicked, toggle night mode on or off
-            nightMode.addEventListener('click', function (event) {
-                event.preventDefault();
-                document.documentElement.classList.toggle('dark');
-                if (document.documentElement.classList.contains('dark')) {
-                    localStorage.setItem('gmtNightMode', true);
-                    return;
-                }
-                localStorage.removeItem('gmtNightMode');
-            }, false);
-    
-        })(window, document);
-    </script>-->
+<script>
 
-    <!-- Scripts
-    ================================================== -->
-    <script src="{% static 'assets/js/tippy.all.min.js' %}"></script>
-    <script src="{% static 'assets/js/jquery-3.3.1.min.js' %}"></script>
-    <script src="{% static 'assets/js/uikit.js' %}"></script>
-    <script src="{% static 'assets/js/simplebar.js' %}"></script>
-    <script src="{% static 'assets/js/custom.js' %}"></script>
+// Toggle password
+function togglePassword(id) {
+    let input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+}
 
+// CAPTCHA refresh
+function refreshCaptcha() {
+    document.getElementById('captchaCode').innerText =
+        Math.random().toString(36).substring(2, 10).toUpperCase();
+}
+
+// AJAX LOGIN
+document.getElementById('loginForm').addEventListener('submit', function(e){
+    e.preventDefault();
+
+    const captchaInput = document.getElementById('captchaInput').value;
+    const captchaCode = document.getElementById('captchaCode').innerText;
+
+    if (captchaInput !== captchaCode) {
+        showMessage("Invalid CAPTCHA", "error");
+        refreshCaptcha();
+        return;
+    }
+
+    fetch("{% url 'signin' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status === "success"){
+            showMessage("Login successful!", "success");
+            setTimeout(() => {
+                window.location.href = "{% url 'home' %}";
+            }, 1000);
+        } else {
+            showMessage("Invalid credentials", "error");
+        }
+    })
+    .catch(() => {
+        showMessage("Something went wrong", "error");
+    });
+
+});
+
+// Message UI
+function showMessage(msg, type) {
+    const box = document.getElementById('messageBox');
+    box.style.display = "block";
+    box.innerText = msg;
+
+    if (type === "success") {
+        box.style.background = "#10b981";
+    } else {
+        box.style.background = "#ef4444";
+    }
+}
+
+</script>
 
 </body>
+</html> 
 
 
-</html>
+
