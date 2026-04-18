@@ -7,10 +7,56 @@
     <title>Login - SocialSphere</title>
 
     <link href="{% static 'assets/images/favicon.png' %}" rel="icon">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .captcha-image {
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            height: 50px;
+        }
+        
+        .refresh-captcha {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: 10px;
+            color: #4a5568;
+        }
+        
+        .refresh-captcha:hover {
+            color: #3182ce;
+        }
+        
+        .captcha-box {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .error-message, .success-message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+            display: none;
+        }
+        
+        .error-message {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .success-message {
+            background: #10b981;
+            color: white;
+        }
+    </style>
 </head>
 
 <body>
@@ -38,9 +84,18 @@
             <p>Login to continue</p>
         </div>
 
-        <div id="messageBox" class="error-message"></div>
+        <!-- Display Django messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}error-message{% elif message.tags == 'success' %}success-message{% else %}error-message{% endif %}" 
+                     style="display: block;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
 
-        <form id="loginForm">
+        <!-- Regular form submission (no AJAX) -->
+        <form method="POST" action="{% url 'signin' %}">
             {% csrf_token %}
 
             <!-- USERNAME -->
@@ -59,27 +114,28 @@
                     onclick="togglePassword('password')"></i>
             </div>
 
-            <!-- CAPTCHA -->
+            <!-- SERVER-SIDE CAPTCHA -->
             <div class="captcha-container">
                 <div class="captcha-box">
-                    <div id="captchaCode" class="captcha-code">A3F8G9H2</div>
-                    <button type="button" class="refresh-captcha"
-                        onclick="refreshCaptcha()">
+                    <img src="{{ captcha_image }}" alt="CAPTCHA" id="captchaImage" class="captcha-image">
+                    <button type="button" class="refresh-captcha" onclick="refreshCaptcha()">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
 
                 <div class="input-group captcha-input">
                     <i class="fas fa-shield-alt"></i>
-                    <input type="text" id="captchaInput"
-                        placeholder="Enter CAPTCHA" required>
+                    <input type="text" name="captcha_1" id="captchaInput" 
+                           placeholder="Enter CAPTCHA code" required>
+                    <input type="hidden" name="captcha_0" id="captchaHashkey" value="{{ captcha_hashkey }}">
                 </div>
+                <small style="color: #666;">Click the image to refresh if you can't read it</small>
             </div>
 
             <!-- OPTIONS -->
             <div class="form-options">
                 <label class="checkbox-label">
-                    <input type="checkbox"> Remember Me
+                    <input type="checkbox" name="remember_me"> Remember Me
                 </label>
                 <a href="#" class="forgot-link">Forgot Password?</a>
             </div>
@@ -105,71 +161,66 @@
 
 <script>
 
-// Toggle password
+// Toggle password visibility
 function togglePassword(id) {
     let input = document.getElementById(id);
-    input.type = input.type === "password" ? "text" : "password";
-}
-
-// CAPTCHA refresh
-function refreshCaptcha() {
-    document.getElementById('captchaCode').innerText =
-        Math.random().toString(36).substring(2, 10).toUpperCase();
-}
-
-// AJAX LOGIN
-document.getElementById('loginForm').addEventListener('submit', function(e){
-    e.preventDefault();
-
-    const captchaInput = document.getElementById('captchaInput').value;
-    const captchaCode = document.getElementById('captchaCode').innerText;
-
-    if (captchaInput !== captchaCode) {
-        showMessage("Invalid CAPTCHA", "error");
-        refreshCaptcha();
-        return;
+    let icon = event.target;
+    
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+    } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
     }
+}
 
-    fetch("{% url 'signin' %}", {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: new URLSearchParams({
-            username: document.getElementById('username').value,
-            password: document.getElementById('password').value
+// Refresh CAPTCHA using server-side endpoint
+function refreshCaptcha() {
+    const captchaImage = document.getElementById('captchaImage');
+    const captchaHashkey = document.getElementById('captchaHashkey');
+    const captchaInput = document.getElementById('captchaInput');
+    
+    // Show loading state on image
+    captchaImage.style.opacity = '0.5';
+    
+    fetch('/captcha/refresh/')
+        .then(response => response.json())
+        .then(data => {
+            // Update CAPTCHA image and hashkey
+            captchaImage.src = data.image_url;
+            captchaHashkey.value = data.key;
+            captchaInput.value = ''; // Clear the input field
+            captchaImage.style.opacity = '1';
         })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.status === "success"){
-            showMessage("Login successful!", "success");
-            setTimeout(() => {
-                window.location.href = "{% url 'home' %}";
-            }, 1000);
-        } else {
-            showMessage("Invalid credentials", "error");
-        }
-    })
-    .catch(() => {
-        showMessage("Something went wrong", "error");
-    });
+        .catch(error => {
+            console.error('Error refreshing CAPTCHA:', error);
+            captchaImage.style.opacity = '1';
+            // Fallback: reload the page to get new CAPTCHA
+            location.reload();
+        });
+}
 
+// Optional: Auto-refresh CAPTCHA after 5 minutes
+let captchaTimeout;
+function resetCaptchaTimer() {
+    if (captchaTimeout) clearTimeout(captchaTimeout);
+    captchaTimeout = setTimeout(() => {
+        refreshCaptcha();
+    }, 300000); // 5 minutes
+}
+
+// Reset timer on user interaction
+document.getElementById('captchaInput').addEventListener('focus', resetCaptchaTimer);
+document.getElementById('captchaImage').addEventListener('click', function() {
+    refreshCaptcha();
+    resetCaptchaTimer();
 });
 
-// Message UI
-function showMessage(msg, type) {
-    const box = document.getElementById('messageBox');
-    box.style.display = "block";
-    box.innerText = msg;
-
-    if (type === "success") {
-        box.style.background = "#10b981";
-    } else {
-        box.style.background = "#ef4444";
-    }
-}
+// Initial timer start
+resetCaptchaTimer();
 
 </script>
 

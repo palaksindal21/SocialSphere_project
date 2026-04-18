@@ -6,122 +6,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - SocialSphere</title>
 
+    <!-- Favicon -->
     <link href="{% static 'assets/images/favicon.png' %}" rel="icon">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 </head>
-
 <body>
 
-<!-- NAVBAR -->
 <nav>
     <h2 class="logo">SocialSphere</h2>
-
     <div class="nav-links">
         <a href="{% url 'home' %}">Home</a>
         <a href="#">Features</a>
         <a href="#">About</a>
     </div>
-
     <div class="auth">
-        <button onclick="location.href="{% url 'signin' %}"">Login</button>
+        <button onclick="location.href='{% url 'signin' %}'">Login</button>
     </div>
 </nav>
 
-<!-- SIGNUP -->
 <section class="auth-section">
     <div class="auth-container">
-
-        <!-- HEADER -->
         <div class="auth-header">
             <i class="fas fa-user-plus"></i>
             <h2>Create Account</h2>
-            <p>Join the SocialSphere community</p>
+            <p>Join SocialSphere today</p>
         </div>
 
-        <!-- MESSAGE -->
-        <div id="messageBox" class="error-message"></div>
+        <!-- Display Django messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}error-message{% elif message.tags == 'success' %}success-message{% else %}info-message{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
 
-        <!-- FORM -->
-        <form id="signupForm">
-
+        <form method="POST" action="{% url 'signup' %}">
             {% csrf_token %}
 
             <!-- USERNAME -->
             <div class="input-group">
-                <i class="fas fa-at"></i>
-                <input type="text" name="username" id="username"
-                    placeholder="Username" required>
-                <small class="input-hint">letters, numbers, underscore</small>
+                <i class="fas fa-user"></i>
+                <input type="text" name="username" id="username" placeholder="Username" required>
             </div>
 
             <!-- EMAIL -->
             <div class="input-group">
                 <i class="fas fa-envelope"></i>
-                <input type="email" name="email" id="email"
-                    placeholder="Email Address" required>
+                <input type="email" name="email" id="email" placeholder="Email" required>
             </div>
+
+            <!-- BIRTH DATE -->
+            <div class="input-group">
+                <i class="fas fa-calendar-alt"></i>
+                <input type="date" name="birth_date" id="birth_date" placeholder="Birth Date" required>
+            </div>
+            <div class="help-text">
+                <i class="fas fa-info-circle"></i> You must be at least 18 years old to register
+            </div>
+            <div id="ageError" class="age-error"></div>
 
             <!-- PASSWORD -->
             <div class="input-group">
                 <i class="fas fa-lock"></i>
-                <input type="password" name="password" id="password"
-                    placeholder="Password" required>
-                <i class="fas fa-eye-slash toggle-password"
-                    onclick="togglePassword('password')"></i>
+                <input type="password" name="password" id="password" placeholder="Password" required>
+                <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('password')"></i>
             </div>
-
-            <div id="passwordStrength" class="password-strength"></div>
 
             <!-- CONFIRM PASSWORD -->
             <div class="input-group">
-                <i class="fas fa-check-circle"></i>
-                <input type="password" name="password2" id="confirmPassword"
-                    placeholder="Confirm Password" required>
-                <i class="fas fa-eye-slash toggle-password"
-                    onclick="togglePassword('confirmPassword')"></i>
-            </div>
-
-            <!-- TERMS -->
-            <div class="terms-checkbox">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="terms" required>
-                    <span>I agree to Terms & Privacy Policy</span>
-                </label>
+                <i class="fas fa-lock"></i>
+                <input type="password" name="password2" id="password2" placeholder="Confirm Password" required>
+                <i class="fas fa-eye-slash toggle-password" onclick="togglePassword('password2')"></i>
             </div>
 
             <!-- CAPTCHA -->
             <div class="captcha-container">
                 <div class="captcha-box">
-                    <div id="captchaCode" class="captcha-code">A3F8G9H2</div>
-                    <button type="button" class="refresh-captcha"
-                        onclick="refreshCaptcha()">
+                    <img src="{{ captcha_image }}" alt="CAPTCHA" id="captchaImage" class="captcha-image">
+                    <button type="button" class="refresh-captcha" onclick="refreshCaptcha()">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
-
                 <div class="input-group captcha-input">
                     <i class="fas fa-shield-alt"></i>
-                    <input type="text" id="captchaInput"
-                        placeholder="Enter CAPTCHA" required>
+                    <input type="text" name="captcha_1" id="captchaInput" placeholder="Enter CAPTCHA code" required>
+                    <input type="hidden" name="captcha_0" id="captchaHashkey" value="{{ captcha_hashkey }}">
                 </div>
             </div>
 
-            <!-- BUTTON -->
-            <button type="submit" class="auth-btn">
-                Create Account
+            <button type="submit" class="auth-btn" id="submitBtn">
+                Sign Up
             </button>
-
         </form>
 
         <div class="auth-footer">
             <p>Already have an account?
-                <a href="{% url 'signin' %}">Login</a>
+                <a href="{% url 'signin' %}">Login here</a>
             </p>
         </div>
-
     </div>
 </section>
 
@@ -129,103 +117,8 @@
     <p>© 2026 SocialSphere</p>
 </footer>
 
-<!-- JS -->
-<script>
-
-// Toggle Password
-function togglePassword(id) {
-    let input = document.getElementById(id);
-    input.type = input.type === "password" ? "text" : "password";
-}
-
-// Password Strength
-document.getElementById('password').addEventListener('input', function () {
-    const val = this.value;
-    const div = document.getElementById('passwordStrength');
-
-    let strength = 0;
-    if (val.length >= 8) strength++;
-    if (/[A-Z]/.test(val) && /[a-z]/.test(val)) strength++;
-    if (/[0-9]/.test(val)) strength++;
-    if (/[^A-Za-z0-9]/.test(val)) strength++;
-
-    const text = ['Weak', 'Fair', 'Good', 'Strong'];
-    const color = ['#ef4444', '#f59e0b', '#eab308', '#10b981'];
-
-    div.innerHTML = val ?
-        `Strength: <span style="color:${color[strength-1]}">${text[strength-1] || 'Very Weak'}</span>` : '';
-});
-
-// CAPTCHA
-function refreshCaptcha() {
-    document.getElementById('captchaCode').innerText =
-        Math.random().toString(36).substring(2, 10).toUpperCase();
-}
-
-// AJAX SUBMIT
-document.getElementById('signupForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const pass = document.getElementById('password').value;
-    const confirm = document.getElementById('confirmPassword').value;
-    const captchaInput = document.getElementById('captchaInput').value;
-    const captchaCode = document.getElementById('captchaCode').innerText;
-
-    const messageBox = document.getElementById('messageBox');
-
-    // Validation
-    if (pass !== confirm) {
-        showMessage("Passwords do not match", "error");
-        return;
-    }
-
-    if (captchaInput !== captchaCode) {
-        showMessage("Invalid CAPTCHA", "error");
-        refreshCaptcha();
-        return;
-    }
-
-    // AJAX CALL
-    fetch("{% url 'signup' %}", {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value,
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: new URLSearchParams({
-            username: document.getElementById('username').value,
-            email: document.getElementById('email').value,
-            password: pass,
-            password2: confirm
-        })
-    })
-    .then(res => res.text())
-    .then(data => {
-        showMessage("Account created successfully!", "success");
-        setTimeout(() => {
-            window.location.href = "{% url 'signin' %}";
-        }, 1500);
-    })
-    .catch(() => {
-        showMessage("Something went wrong!", "error");
-    });
-
-});
-
-// Message UI
-function showMessage(msg, type) {
-    const box = document.getElementById('messageBox');
-    box.style.display = "block";
-    box.innerText = msg;
-
-    if (type === "success") {
-        box.style.background = "#10b981";
-    } else {
-        box.style.background = "#ef4444";
-    }
-}
-
-</script>
+<!-- Custom JavaScript -->
+<script src="{% static 'js/signup.js' %}"></script>
 
 </body>
 </html>

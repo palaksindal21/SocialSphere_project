@@ -22,5 +22,10 @@ urlpatterns = [
     path('comment/edit/<uuid:comment_id>/', views.edit_comment, name='edit_comment'),
     path('save-post/<uuid:post_id>/', views.save_post, name='save_post'),
     path('saved/', views.saved_posts, name='saved_posts'),
+    path('get-followers/<str:username>/', views.get_followers, name='get_followers'),
+    path('get-following/<str:username>/', views.get_following, name='get_following'),
+    path('post/delete/<uuid:post_id>/', views.delete_post, name='delete_post'),
+    path('auto-logout/', views.auto_logout, name='auto_logout'),
+    path('post/delete/<uuid:post_id>/', views.delete_post, name='delete_post')
 
 ]

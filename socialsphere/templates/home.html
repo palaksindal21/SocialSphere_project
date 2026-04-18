@@ -177,6 +177,60 @@
         color: white;
     }
     
+    /* Activity Card Styles */
+    .activity-card {
+        margin-bottom: 20px;
+    }
+    
+    .activity-card h4 {
+        color: #ff007f;
+        margin-bottom: 15px;
+        font-size: 16px;
+        text-align: center;
+    }
+    
+    .activity-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+    }
+    
+    .activity-divider {
+        height: 1px;
+        background: #2a2a2a;
+        margin: 5px 0;
+    }
+    
+    .activity-label {
+        color: #8e8e8e;
+        font-size: 14px;
+    }
+    
+    .activity-value {
+        color: #ff007f;
+        font-size: 18px;
+        font-weight: bold;
+    }
+    
+    .activity-link {
+        display: block;
+        text-align: center;
+        padding: 8px;
+        background: #1a1a1a;
+        color: #ff007f;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 12px;
+        transition: all 0.3s;
+        margin-top: 10px;
+    }
+    
+    .activity-link:hover {
+        background: #ff007f;
+        color: white;
+    }
+    
     @media (max-width: 768px) {
         .container {
             grid-template-columns: 1fr;
@@ -202,7 +256,10 @@
 
 <!-- NAVBAR -->
 <nav class="navbar">
-    <h2 class="logo">✨ SocialSphere</h2>
+    <div class="logo">
+            <i class="fas fa-globe"></i>
+            <span>SocialSphere</span>
+        </div>
 
     <form action="{% url 'search' %}" method="POST" class="search-box">
         {% csrf_token %}
@@ -211,10 +268,10 @@
     </form>
 
     <div class="nav-right">
-        <a href="#" style="color: white;">notifications
+        <a href="#" style="color: white;">
             <i class="fa fa-bell"></i>
         </a>
-        <a href="#" style="color: white;">inbox
+        <a href="#" style="color: white;">
             <i class="fa fa-comment"></i>
         </a>
         <a href="{% url 'saved_posts' %}" style="color: white;">
@@ -290,13 +347,8 @@
                 </div>
             </div>
 
-            <!-- Post Caption -->
             <p class="caption">{{post.caption}}</p>
-
-            <!-- Post Image -->
             <img src="{{post.image.url}}" class="post-img" alt="Post">
-
-            <!-- Post Actions -->
             <div class="actions">
                 <a href="{% url 'like_post' %}?post_id={{post.id}}" class="like-btn">
                     ❤️ {{post.no_of_likes}}
@@ -306,7 +358,6 @@
                     💬 {{post.comments.count}}
                 </a>
 
-                <!-- Save Button -->
                 <form method="POST" action="{% url 'save_post' post.id %}" style="display: inline; margin: 0;">
                     {% csrf_token %}
                     <button type="submit" class="save-btn">
@@ -331,7 +382,7 @@
                 <button type="submit">Post</button>
             </form>
 
-            <!-- Display Recent Comments -->
+            
             {% with post.comments.all|slice:":2" as recent_comments %}
                 {% if recent_comments %}
                     <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #1c1c1c;">
@@ -358,10 +409,10 @@
 
     </div>
 
-    <!-- RIGHT SIDEBAR -->
+  
     <div class="sidebar">
 
-        <!-- Suggestions Card -->
+        
         <div class="card">
             <h4>👥 Suggested for you</h4>
             
@@ -386,14 +437,34 @@
             {% endif %}
         </div>
 
-        <!-- Trending Section -->
-        <div class="card">
-            <h4>🔥 Trending</h4>
-            <div style="margin-top: 10px;">
-                <p style="font-size: 12px;">#SocialSphere</p>
-                <p style="font-size: 12px;">#DarkMode</p>
-                <p style="font-size: 12px;">#NewFeatures</p>
+        <div class="card activity-card">
+            <h4>⏱️ Your Activity</h4>
+            
+            <div class="activity-item">
+                <span class="activity-label">📅 Today</span>
+                <span class="activity-value">
+                    {% if today_hours > 0 %}
+                        {{ today_hours }}h {{ today_minutes }}m
+                    {% else %}
+                        {{ today_minutes }} min
+                    {% endif %}
+                </span>
             </div>
+            
+            <div class="activity-divider"></div>
+            
+            <div class="activity-item">
+                <span class="activity-label">📊 Total</span>
+                <span class="activity-value">
+                    {% if total_hours > 0 %}
+                        {{ total_hours }}h {{ total_minutes }}m
+                    {% else %}
+                        {{ total_minutes }} min
+                    {% endif %}
+                </span>
+            </div>
+            
+            
         </div>
 
         <!-- Footer Info -->
