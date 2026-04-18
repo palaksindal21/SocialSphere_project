@@ -10,7 +10,6 @@ urlpatterns = [
     path('signin',views.signin, name='signin'),
     path('logout/',views.logout, name='logout'),
     path('upload/',views.upload, name='upload'),
-    path('follow/',views.follow,name='follow'),
     path('search/',views.search, name='search'),
     path('profile/<str:pk>',views.profile, name='profile'),
     path('like-post/', views.like_post, name='like_post'),
@@ -26,6 +25,13 @@ urlpatterns = [
     path('get-following/<str:username>/', views.get_following, name='get_following'),
     path('post/delete/<uuid:post_id>/', views.delete_post, name='delete_post'),
     path('auto-logout/', views.auto_logout, name='auto_logout'),
-    path('post/delete/<uuid:post_id>/', views.delete_post, name='delete_post')
+    path('post/delete/<uuid:post_id>/', views.delete_post, name='delete_post'),
+    path('follow/<str:username>/', views.follow_or_request_view, name='follow'),
+    path('unfollow/<str:username>/', views.unfollow_view, name='unfollow'),
+    path('approve-request/<int:request_id>/', views.approve_request_view, name='approve_request'),
+    path('reject-request/<int:request_id>/', views.reject_request_view, name='reject_request'),
+    path('pending-requests/', views.pending_requests_view, name='pending_requests'),
+    path('toggle-privacy/', views.toggle_privacy_view, name='toggle_privacy'),
+    path('pending-requests/count/', views.pending_requests_count, name='pending_requests_count'),
 
 ]

@@ -11,18 +11,23 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from captcha.models import CaptchaStore
 from captcha.helpers import captcha_image_url
+from .follow_utils import (follow_user, unfollow_user, send_follow_request, 
+                           approve_follow_request, reject_follow_request,
+                        cancel_follow_request, get_pending_requests,
+                        check_follow_status,get_follow_relationship_status)
 # Create your views here.
 
+#Landig Page 
 def landing(request):
     if request.user.is_authenticated:
         return redirect('home')
     
     return render(request, 'landing.html')
 
+# Home page
 @login_required(login_url='signin')
 def home(request):
     user_object = request.user
-    # user_profile = Profile.objects.get(user=user_object)
     user_profile = Profile.objects.filter(user=user_object).first()
 
     if user_profile is None:
@@ -31,10 +36,11 @@ def home(request):
     user_following_list = []
     feed = []
 
-    user_following = FollowersCount.objects.filter(follower=request.user.username)
-    user_followers = FollowersCount.objects.filter(user=request.user.username).count()
-    user_following_count = FollowersCount.objects.filter(follower=request.user.username).count()
+    user_following = FollowersCount.objects.filter(follower=request.user.username, is_accepted=True)
+    user_followers = FollowersCount.objects.filter(user=request.user.username, is_accepted=True).count()
+    user_following_count = FollowersCount.objects.filter(follower=request.user.username, is_accepted=True).count()
     user_posts_count = Post.objects.filter(user=request.user.username).count()
+    
     for users in user_following:
         user_following_list.append(users.user)
 
@@ -87,6 +93,11 @@ def home(request):
     total_hours = total_minutes // 60
     total_remaining_minutes = total_minutes % 60
 
+    # Get pending requests count for notification
+    pending_requests = FollowRequest.objects.filter(to_user=request.user.username, status='pending')
+    pending_requests_count = pending_requests.count()
+
+
     context = {
         'user_profile': user_profile,
         'posts': feed_list,
@@ -98,11 +109,14 @@ def home(request):
         'today_minutes': today_remaining_minutes,
         'total_hours': total_hours,
         'total_minutes': total_remaining_minutes,
+        'pending_requests': pending_requests,
+        'pending_requests_count': pending_requests_count,
+        
     }
 
     return render(request, 'home.html', context)
 
-
+# Signup Page
 def signup(request):
     if request.method == 'POST':
         captcha_key = request.POST.get('captcha_0')
@@ -175,7 +189,7 @@ def signup(request):
         captcha_image = captcha_image_url(hashkey)
         return render(request, 'signup.html', {'captcha_hashkey': hashkey, 'captcha_image': captcha_image})
 
-
+# Signin page
 def signin(request):
     if request.method == 'POST':
         captcha_key = request.POST.get('captcha_0')
@@ -212,6 +226,7 @@ def signin(request):
         return render(request, 'signin.html',{'captcha_hashkey': hashkey, 'captcha_image': captcha_image}) 
     
 
+# Logout
 @login_required(login_url='signin')
 def logout(request):
     username = request.user.username
@@ -236,6 +251,7 @@ def logout(request):
     auth.logout(request)
     return redirect('signin')
 
+# Auto logout when user leaves browser
 @csrf_exempt
 def auto_logout(request):
     if request.user.is_authenticated:
@@ -267,6 +283,7 @@ def auto_logout(request):
     return JsonResponse({'status': 'ok'})
 
 
+# Create post
 @login_required(login_url='signin')
 def upload(request):
     if request.method == 'POST':
@@ -280,7 +297,8 @@ def upload(request):
         return redirect('/')
     else:
         return redirect('/')
-    
+
+    # Delete Post
 @login_required(login_url='signin')    
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
@@ -298,32 +316,15 @@ def delete_post(request, post_id):
 
     messages.success(request, 'Post deleted permanently!!')
     return redirect(request.META.get('HTTP_REFERER', 'home'))
-
-
-@login_required(login_url='signin')
-def follow(request):
-    if request.method == 'POST':
-        follower = request.POST.get('follower')
-        user = request.POST.get('user')
-
-        if not follower or not user:              
-           return redirect('/')
-        
-        if FollowersCount.objects.filter(follower=follower, user=user).exists():
-            FollowersCount.objects.filter(follower=follower, user=user).delete()
-        else:
-            FollowersCount.objects.create(follower=follower, user=user)
-
-            return redirect('profile', pk=user)
-
-    return redirect('/')
-
-
+    
+# Search User
 @login_required(login_url='signin')
 def search(request):
     user_object = User.objects.get(username=request.user.username)
-    # user_profile = Profile.objects.get(user=user_object)
     user_profile = Profile.objects.filter(user=user_object).first()
+
+    username_profile_list = []
+    username = ''
 
     if request.method == 'POST':
         username = request.POST['username']
@@ -340,27 +341,40 @@ def search(request):
             username_profile_list.append(profile_lists)
 
         username_profile_list = list(chain(*username_profile_list))
-    return render(request, 'search.html', {'user_profile':user_profile, 'username_profile_list':username_profile_list, 'username': username})
+    return render(request, 'search.html', {
+        'user_profile': user_profile, 
+        'username_profile_list': username_profile_list, 
+        'username': username
+    })
 
 
+# Profile page
 @login_required(login_url='signin')
 def profile(request, pk):
     user_object = User.objects.get(username=pk)
     user_profile = Profile.objects.get(user=user_object)
-    user_posts = Post.objects.filter(user=pk)
-    user_post_length = len(user_posts)
+    
+    can_view_content = False
 
-    follower = request.user.username
-    user = pk
+    if request.user == user_object:
+        can_view_content = True
+    elif not user_profile.is_private:
+        can_view_content = True
+    elif FollowersCount.objects.filter(follower = request.user.username, user = pk, is_accepted = True).exists():
+        can_view_content = True
+ 
+#   Get relationship status using helper
+    relationship = get_follow_relationship_status(request.user, user_object)
 
-    if FollowersCount.objects.filter(follower=follower, user=user).first():
-        button_text = 'Unfollow'
+    user_followers = FollowersCount.objects.filter(user=pk, is_accepted=True).count()
+    user_following = FollowersCount.objects.filter(follower=pk, is_accepted=True).count()
 
+    if can_view_content:
+        user_posts = Post.objects.filter(user=pk)
+        user_post_length = len(user_posts)
     else:
-        button_text = 'Follow'
-
-    user_followers = FollowersCount.objects.filter(user=pk).count()
-    user_following = FollowersCount.objects.filter(follower=pk).count()
+        user_posts = []
+        user_post_length = 0
 
     saved_posts = []
     if request.user.username == pk:
@@ -372,19 +386,29 @@ def profile(request, pk):
         'user_profile': user_profile,
         'user_posts': user_posts,
         'user_post_length': user_post_length,
-        'button_text': button_text,
+        'button_text': relationship['button_text'],
+        'button_action': relationship['button_action'],
         'user_followers': user_followers,
         'user_following': user_following,
         'saved_posts': saved_posts,
-
+        'can_view_content': can_view_content,
+        'is_private': user_profile.is_private,
+        'is_following': relationship['is_following'],
+        'has_pending_request': relationship['has_pending_request_from_me'],
     }
 
     return render(request, 'profile.html', context)
 
+# Followers List
 @login_required(login_url='signin')
 def get_followers(request, username):
     try:
-        follower_records = FollowersCount.objects.filter(user=username)
+        user = User.objects.get(username=username)
+
+        if user.profile.is_private and request.user.username != username:
+            return JsonResponse({'error': 'This account is private'}, status=403)
+        
+        follower_records = FollowersCount.objects.filter(user=username, is_accepted=True)
         followers_list = []
 
         for record in follower_records:
@@ -392,23 +416,29 @@ def get_followers(request, username):
                 follower_username = record.follower
                 follower_user = User.objects.get(username=follower_username)
                 follower_profile = Profile.objects.filter(user=follower_user).first()
-                followers_list.append({'username':follower_user.username,
-                                       'bio':follower_profile.bio if follower_profile else 'No bio',
-                                       'avatar': follower_profile.profileimage.url if follower_profile else 'static/images/default-avatar.jpg'})
+                followers_list.append({
+                    'username': follower_user.username,
+                    'bio': follower_profile.bio if follower_profile else 'No bio',
+                    'avatar': follower_profile.profileimage.url if follower_profile else '/static/images/default-avatar.jpg'})
             except User.DoesNotExist:
                 continue
 
-            return JsonResponse({'followers':followers_list,
-                                 'count':len(followers_list)})
+            return JsonResponse({'followers': followers_list, 'count': len(followers_list)})
+        
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
     
 
-
+# Following list
 @login_required(login_url='signin')
 def get_following(request, username):
     try:
-        following_records = FollowersCount.objects.filter(follower=username)
+        user = User.objects.get(username=username)
+        
+        if user.profile.is_private and request.user.username != username:
+            return JsonResponse({'error': 'This account is private'}, status=403)
+        
+        following_records = FollowersCount.objects.filter(follower=username, is_accepted=True)
         following_list = []
 
         for record in following_records:
@@ -424,17 +454,12 @@ def get_following(request, username):
             except User.DoesNotExist:
                 continue
 
-        return JsonResponse({
-            'following': following_list,
-            'count': len(following_list)
-        })
+        return JsonResponse({'following': following_list, 'count': len(following_list)})
     
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
 
-
-
-   
+# Like post  
 @login_required(login_url='signin')
 def like_post(request):
     username = request.user.username
@@ -457,13 +482,21 @@ def like_post(request):
         post.save()
         return redirect('/')
 
+# Settings page
 @login_required(login_url='signin')      
 def settings(request):
     user_profile = Profile.objects.filter(user=request.user).first()
 
     if request.method == 'POST':
-        if request.FILES.get('image') == None:
-            image = request.FILES.get('image') or user_profile.profileimage
+        if 'toggle_privacy' in request.POST:
+            user_profile.is_private = not user_profile.is_private
+            user_profile.save()
+            messages.success(request, f"Account is now {'Private' if user_profile.is_private else 'Public'}")
+            return redirect('settings')
+        
+        # Regular profile update
+        if request.FILES.get('image') is None:
+            image = user_profile.profileimage
             bio = request.POST['bio']
             location = request.POST['location']
 
@@ -472,7 +505,7 @@ def settings(request):
             user_profile.location = location
             user_profile.save()
         
-        if request.FILES.get('image') != None:
+        if request.FILES.get('image') is not None:
             image = request.FILES.get('image')
             bio = request.POST['bio']
             location = request.POST['location']
@@ -483,8 +516,16 @@ def settings(request):
             user_profile.save()
 
         return redirect('settings')
-    return render(request, 'settings.html', {'user_profile':user_profile})
+    
+    # Get pending requests count for notification badge
+    pending_count = FollowRequest.objects.filter(to_user=request.user.username, status='pending').count()
+    
+    return render(request, 'settings.html', {
+        'user_profile': user_profile,
+        'pending_count': pending_count
+    })
 
+# Add comment on post
 @login_required(login_url='signin')
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id)
@@ -501,6 +542,7 @@ def add_comment(request, post_id):
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
+# Add reply to the comment
 @login_required(login_url='signin')
 def add_reply(request, comment_id):
     parent_comment = get_object_or_404(Comment, id=comment_id)
@@ -516,6 +558,7 @@ def add_reply(request, comment_id):
 
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
+# Delete comment
 @login_required(login_url='signin')
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
@@ -529,6 +572,7 @@ def delete_comment(request, comment_id):
 
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
+# View comments
 @login_required(login_url='signin')
 def view_comments(request, post_id):
     post = get_object_or_404(Post, id=post_id)
@@ -549,7 +593,7 @@ def view_comments(request, post_id):
         'comments': comments
     })
 
-
+# Edit comment
 @login_required(login_url='signin')
 def edit_comment(request, comment_id):
     comment = get_object_or_404(Comment, id=comment_id)
@@ -577,6 +621,7 @@ def edit_comment(request, comment_id):
         'post': comment.post
     })
 
+
 # save unsave post
 @login_required(login_url='signin')
 def save_post(request, post_id):
@@ -594,6 +639,7 @@ def save_post(request, post_id):
         is_saved = True
 
     return redirect(request.META.get('HTTP_REFERER', 'home'))
+
 
 # view saved posts
 @login_required(login_url='signin')
@@ -621,4 +667,106 @@ def saved_posts(request):
     
     return render(request, 'saved_posts.html', context)
 
+# Follow user
+@login_required(login_url='signin')
+def follow_or_request_view(request, username):
+    if request.method == 'POST':
+        try:
+            user_to_interact = User.objects.get(username=username)
 
+            if user_to_interact.profile.is_private:
+                result = send_follow_request(request, username)
+            else:
+                result = follow_user(request, username)
+
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': result if isinstance(result, bool) else False})
+            
+            return redirect(request.META.get('HTTP_REFERER', 'home'))
+        
+        except User.DoesNotExist:
+            messages.error(request, 'User does not found!!')
+            return redirect('home')
+        
+# Unfollow user
+@login_required(login_url='signin')
+def unfollow_view(request, username):
+    if request.method == 'POST':
+        result = unfollow_user(request, username)
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': result})
+        
+        return redirect(request.META.get('HTTP_REFERER', 'home'))
+    return redirect('home')
+
+# Approve request
+@login_required(login_url='signin')
+def approve_request_view(request, request_id):
+    if request.method == 'POST':
+        result = approve_follow_request(request, request_id)
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': result})
+        
+        return redirect('pending_requests')
+    return redirect('pending_requests')
+
+# Reject follow request
+@login_required(login_url='signin')
+def reject_request_view(request, request_id):
+    if request.method == 'POST':
+        result = reject_follow_request(request, request_id)
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': result})
+        
+        return redirect('pending_requests')
+    return redirect('pending_requests')
+
+# Pending requests
+@login_required(login_url='signin')
+def pending_requests_view(request):
+    pending_requests = get_pending_requests(request.user)
+    user_profile = Profile.objects.filter(user=request.user).first()
+
+    for req in pending_requests:
+        try:
+            req.requester_profile = Profile.objects.filter(user__username=req.from_user).first()
+        except:
+            req.requester_profile = None
+    
+   
+    user_followers = FollowersCount.objects.filter(user=request.user.username, is_accepted=True).count()
+    user_following = FollowersCount.objects.filter(follower=request.user.username, is_accepted=True).count()
+
+    context = {
+        'pending_requests': pending_requests,
+        'user_profile': user_profile,
+        'pending_count': pending_requests.count(),
+        'user_followers': user_followers,      
+        'user_following': user_following,     
+    }
+
+    return render(request, 'pending_requests.html', context)
+
+# Toggle privacy private account or public account
+@login_required(login_url='signin')
+def toggle_privacy_view(request):
+    if request.method == 'POST':
+        profile = request.user.profile
+        profile.is_private = not profile.is_private
+        profile.save()
+
+        messages.success(request, f"Your account is now {'Private' if profile.is_private else 'Public'}")
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'is_private': profile.is_private})
+        
+        return redirect('settings')
+    return redirect('settings')
+
+@login_required(login_url='signin')
+def pending_requests_count(request):
+    count = FollowRequest.objects.filter(to_user=request.user.username, status='pending').count()
+    return JsonResponse({'count': count})

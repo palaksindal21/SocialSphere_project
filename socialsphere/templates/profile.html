@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/profile.css' %}">
     
     <style>
-        /* Additional styles to ensure delete button works */
+        /* Additional styles */
         .post-card {
             position: relative !important;
             cursor: pointer;
@@ -49,7 +49,6 @@
             transform: scale(1.1);
         }
         
-        /* Prevent delete button click from triggering post click */
         .post-delete-btn form,
         .post-delete-btn button {
             pointer-events: auto;
@@ -68,6 +67,159 @@
         .post-delete-btn {
             z-index: 2;
         }
+        
+        /* Follow Button Styles */
+        .follow-btn {
+            background: linear-gradient(45deg, #e60796, #ff2da0);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .follow-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #e60796;
+        }
+        
+        .unfollow-btn {
+            background: #333;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .unfollow-btn:hover {
+            background: #ed4956;
+        }
+        
+        .request-sent-btn {
+            background: #666;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            color: white;
+            cursor: not-allowed;
+            font-weight: bold;
+        }
+        
+        .respond-btn {
+            background: #ff9800;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .respond-btn:hover {
+            background: #f57c00;
+            transform: scale(1.05);
+        }
+        
+        /* Private Account Overlay */
+        .private-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .private-content {
+            text-align: center;
+            padding: 40px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            max-width: 400px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .private-content i {
+            font-size: 80px;
+            color: #e60796;
+            margin-bottom: 20px;
+        }
+        
+        .private-content h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .private-content p {
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Privacy Badge */
+        .privacy-badge {
+            display: inline-block;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        
+        .privacy-public {
+            background: #10b981;
+            color: white;
+        }
+        
+        .privacy-private {
+            background: #e60796;
+            color: white;
+        }
+        
+        /* Toast Message */
+        .toast-message {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 12px 24px;
+            border-radius: 10px;
+            color: white;
+            display: none;
+            z-index: 1100;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -83,6 +235,12 @@
         <div class="nav-links">
             <a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a>
             <a href="{% url 'saved_posts' %}"><i class="fas fa-bookmark"></i> Saved</a>
+            <a href="{% url 'pending_requests' %}">
+                <i class="fas fa-user-plus"></i> Requests
+                {% if pending_requests_count > 0 %}
+                <span style="background: #e60796; padding: 2px 6px; border-radius: 10px; font-size: 10px; margin-left: 5px;">{{ pending_requests_count }}</span>
+                {% endif %}
+            </a>
             <a href="{% url 'settings' %}"><i class="fas fa-cog"></i> Settings</a>
         </div>
         
@@ -92,6 +250,30 @@
         </div>
     </div>
 </nav>
+
+<!-- Private Account Overlay (shown when cannot view content) -->
+{% if not can_view_content and user != user_object %}
+<div class="private-overlay" id="privateOverlay">
+    <div class="private-content">
+        <i class="fas fa-lock"></i>
+        <h2>This Account is Private</h2>
+        <p>Follow this account to see their photos and videos.</p>
+        {% if button_action == 'request' %}
+            <button class="follow-btn" onclick="sendFollowRequest('{{ user_object.username }}')">
+                <i class="fas fa-user-plus"></i> Request to Follow
+            </button>
+        {% elif button_action == 'pending' %}
+            <button class="request-sent-btn" disabled>
+                <i class="fas fa-clock"></i> Request Sent
+            </button>
+        {% elif button_action == 'rejected' %}
+            <button class="request-sent-btn" disabled>
+                <i class="fas fa-ban"></i> Request Rejected
+            </button>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
 
 <div class="container">
     
@@ -108,16 +290,41 @@
             
             <div class="profile-details">
                 <div class="profile-name-section">
-                    <h2>{{ user_profile.user.username }}</h2>
-                    {% if user_object.username != user.username %}
-                        <form method="POST" action="{% url 'follow' %}" style="display: inline;">
-                            {% csrf_token %}
-                            <input type="hidden" name="follower" value="{{ request.user.username }}">
-                            <input type="hidden" name="user" value="{{ user_object.username }}">
-                            <button type="submit" class="follow-btn">
-                                <i class="fas fa-user-plus"></i> {{ button_text }}
+                    <h2>
+                        {{ user_object.username }}
+                        {% if user_profile.is_private %}
+                            <span class="privacy-badge privacy-private"><i class="fas fa-lock"></i> Private</span>
+                        {% else %}
+                            <span class="privacy-badge privacy-public"><i class="fas fa-globe"></i> Public</span>
+                        {% endif %}
+                    </h2>
+                    
+                    {% if user != user_object %}
+                        {% if button_action == 'unfollow' %}
+                            <button class="unfollow-btn" onclick="unfollowUser('{{ user_object.username }}')">
+                                <i class="fas fa-user-check"></i> Following
                             </button>
-                        </form>
+                        {% elif button_action == 'pending' %}
+                            <button class="request-sent-btn" disabled>
+                                <i class="fas fa-clock"></i> Request Sent
+                            </button>
+                        {% elif button_action == 'respond' %}
+                            <button class="respond-btn" onclick="location.href='{% url 'pending_requests' %}'">
+                                <i class="fas fa-reply"></i> Respond to Request
+                            </button>
+                        {% elif button_action == 'request' %}
+                            <button class="follow-btn" onclick="sendFollowRequest('{{ user_object.username }}')">
+                                <i class="fas fa-user-plus"></i> Request to Follow
+                            </button>
+                        {% elif button_action == 'rejected' %}
+                            <button class="request-sent-btn" disabled>
+                                <i class="fas fa-ban"></i> Request Rejected
+                            </button>
+                        {% elif button_action == 'follow' %}
+                            <button class="follow-btn" onclick="followUser('{{ user_object.username }}')">
+                                <i class="fas fa-user-plus"></i> Follow
+                            </button>
+                        {% endif %}
                     {% else %}
                         <a href="{% url 'settings' %}" class="edit-btn">
                             <i class="fas fa-edit"></i> Edit Profile
@@ -166,44 +373,47 @@
     
     <!-- ========== POSTS TAB ========== -->
     <div id="posts-tab" class="tab-content active">
-        {% if user_posts %}
-            <div class="posts-grid">
-                {% for post in user_posts %}
-                <div class="post-card">
-                    <!-- Clickable area for entire post -->
-                    <div class="post-click-area" onclick="location.href='{% url 'view_comments' post.id %}'"></div>
-                    
-                    <!-- Post Image -->
-                    <img src="{{ post.image.url }}" alt="Post by {{ post.user }}">
-                    
-                    <!-- Post Overlay (likes & comments) -->
-                    <div class="post-overlay">
-                        <div class="post-stats-overlay">
-                            <span><i class="fas fa-heart"></i> {{ post.no_of_likes }}</span>
-                            <span><i class="fas fa-comment"></i> {{ post.comments.count }}</span>
+        {% if can_view_content %}
+            {% if user_posts %}
+                <div class="posts-grid">
+                    {% for post in user_posts %}
+                    <div class="post-card">
+                        <div class="post-click-area" onclick="location.href='{% url 'view_comments' post.id %}'"></div>
+                        <img src="{{ post.image.url }}" alt="Post by {{ post.user }}">
+                        <div class="post-overlay">
+                            <div class="post-stats-overlay">
+                                <span><i class="fas fa-heart"></i> {{ post.no_of_likes }}</span>
+                                <span><i class="fas fa-comment"></i> {{ post.comments.count }}</span>
+                            </div>
                         </div>
+                        
+                        {% if user_object.username == request.user.username %}
+                        <div class="post-delete-btn">
+                            <form method="POST" action="{% url 'delete_post' post.id %}" 
+                                  onsubmit="return confirm('⚠️ Are you sure? This post will be permanently deleted!');">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-icon" onclick="event.stopPropagation();">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
                     </div>
-                    
-                    <!-- DELETE BUTTON - Only for post owner -->
-                    {% if user_object.username == request.user.username %}
-                    <div class="post-delete-btn">
-                        <form method="POST" action="{% url 'delete_post' post.id %}" 
-                              onsubmit="return confirm('⚠️ Are you sure? This post will be permanently deleted!');">
-                            {% csrf_token %}
-                            <button type="submit" class="delete-icon" onclick="event.stopPropagation();">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
-                    </div>
-                    {% endif %}
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-camera"></i>
+                    <h3>No Posts Yet</h3>
+                    <p>When you create posts, they will appear here</p>
+                </div>
+            {% endif %}
         {% else %}
-            <div class="empty-state">
-                <i class="fas fa-camera"></i>
-                <h3>No Posts Yet</h3>
-                <p>When you create posts, they will appear here</p>
+            <!-- Content is hidden - private account message shown via overlay -->
+            <div style="text-align: center; padding: 60px; color: #aaa;">
+                <i class="fas fa-lock" style="font-size: 64px; margin-bottom: 20px;"></i>
+                <h3>This account is private</h3>
+                <p>Follow to see their posts</p>
             </div>
         {% endif %}
     </div>
@@ -215,13 +425,8 @@
             <div class="posts-grid">
                 {% for post in saved_posts %}
                 <div class="post-card">
-                    <!-- Clickable area for entire post -->
                     <div class="post-click-area" onclick="location.href='{% url 'view_comments' post.id %}'"></div>
-                    
-                    <!-- Post Image -->
                     <img src="{{ post.image.url }}" alt="Saved post">
-                    
-                    <!-- Post Overlay -->
                     <div class="post-overlay">
                         <div class="post-stats-overlay">
                             <span><i class="fas fa-heart"></i> {{ post.no_of_likes }}</span>
@@ -229,7 +434,6 @@
                         </div>
                     </div>
                     
-                    <!-- DELETE BUTTON - Only for post owner -->
                     {% if post.user == request.user.username %}
                     <div class="post-delete-btn">
                         <form method="POST" action="{% url 'delete_post' post.id %}" 
@@ -282,8 +486,41 @@
     </div>
 </div>
 
+<!-- Toast Message -->
+<div id="toastMessage" class="toast-message"></div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+// Get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+// Show toast message
+function showToast(message, type) {
+    const toast = document.getElementById('toastMessage');
+    toast.textContent = message;
+    toast.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
+    toast.style.display = 'block';
+    
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3000);
+}
+
 // Tab switching function
 function showTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(tab => {
@@ -294,6 +531,78 @@ function showTab(tabName) {
     });
     document.getElementById(tabName + '-tab').classList.add('active');
     event.target.closest('.tab-btn').classList.add('active');
+}
+
+// Follow user (for public accounts)
+function followUser(username) {
+    fetch(`/follow/${username}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(`You are now following ${username}`, 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast('Something went wrong', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Network error', 'error');
+    });
+}
+
+// Unfollow user
+function unfollowUser(username) {
+    fetch(`/unfollow/${username}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(`You unfollowed ${username}`, 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast('Something went wrong', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Network error', 'error');
+    });
+}
+
+// Send follow request (for private accounts)
+function sendFollowRequest(username) {
+    fetch(`/follow/${username}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(`Follow request sent to ${username}`, 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast('Request already sent or error occurred', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Network error', 'error');
+    });
 }
 
 // Show Followers Modal
@@ -308,7 +617,7 @@ function showFollowersModal(username) {
         .then(response => response.json())
         .then(data => {
             if (data.error) {
-                modalBody.innerHTML = `<div class="empty-modal">Error: ${data.error}</div>`;
+                modalBody.innerHTML = `<div class="empty-modal">${data.error}</div>`;
                 return;
             }
             if (data.followers.length === 0) {
@@ -347,7 +656,7 @@ function showFollowingModal(username) {
         .then(response => response.json())
         .then(data => {
             if (data.error) {
-                modalBody.innerHTML = `<div class="empty-modal">Error: ${data.error}</div>`;
+                modalBody.innerHTML = `<div class="empty-modal">${data.error}</div>`;
                 return;
             }
             if (data.following.length === 0) {

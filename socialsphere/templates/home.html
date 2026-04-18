@@ -155,6 +155,7 @@
         display: flex;
         gap: 20px;
         align-items: center;
+        position: relative;
     }
     
     .nav-right i {
@@ -165,6 +166,112 @@
     
     .nav-right i:hover {
         color: #ff007f;
+    }
+    
+    /* Notification Dropdown Styles */
+    .notification-icon {
+        position: relative;
+        cursor: pointer;
+    }
+    
+    .notification-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #ff007f;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 10px;
+        min-width: 18px;
+        text-align: center;
+    }
+    
+    .notification-dropdown {
+        display: none;
+        position: absolute;
+        top: 40px;
+        right: 0;
+        width: 350px;
+        max-height: 400px;
+        overflow-y: auto;
+        background: #1a1a1a;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        z-index: 1000;
+        border: 1px solid #333;
+    }
+    
+    .notification-dropdown.show {
+        display: block;
+    }
+    
+    .notification-header {
+        padding: 12px 15px;
+        border-bottom: 1px solid #333;
+        font-weight: bold;
+        color: #ff007f;
+    }
+    
+    .notification-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid #2a2a2a;
+        cursor: pointer;
+        transition: background 0.3s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .notification-item:hover {
+        background: #252525;
+    }
+    
+    .notification-item.unread {
+        background: #2a1a2a;
+    }
+    
+    .notification-content {
+        flex: 1;
+    }
+    
+    .notification-text {
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+    
+    .notification-time {
+        font-size: 10px;
+        color: #666;
+    }
+    
+    .notification-actions {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .notif-approve-btn, .notif-reject-btn {
+        padding: 4px 12px;
+        border-radius: 5px;
+        font-size: 11px;
+        cursor: pointer;
+        border: none;
+    }
+    
+    .notif-approve-btn {
+        background: #10b981;
+        color: white;
+    }
+    
+    .notif-reject-btn {
+        background: #ef4444;
+        color: white;
+    }
+    
+    .empty-notifications {
+        padding: 30px;
+        text-align: center;
+        color: #666;
     }
     
     .comment-box button {
@@ -231,6 +338,25 @@
         color: white;
     }
     
+    /* Privacy Badge */
+    .privacy-badge {
+        display: inline-block;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-left: 5px;
+    }
+    
+    .privacy-public {
+        background: #10b981;
+        color: white;
+    }
+    
+    .privacy-private {
+        background: #ff007f;
+        color: white;
+    }
+    
     @media (max-width: 768px) {
         .container {
             grid-template-columns: 1fr;
@@ -248,6 +374,11 @@
         .search-box input {
             flex: 1;
         }
+        
+        .notification-dropdown {
+            width: 300px;
+            right: -50px;
+        }
     }
 </style>
 </head>
@@ -257,9 +388,9 @@
 <!-- NAVBAR -->
 <nav class="navbar">
     <div class="logo">
-            <i class="fas fa-globe"></i>
-            <span>SocialSphere</span>
-        </div>
+        <i class="fas fa-globe"></i>
+        <span>SocialSphere</span>
+    </div>
 
     <form action="{% url 'search' %}" method="POST" class="search-box">
         {% csrf_token %}
@@ -268,15 +399,58 @@
     </form>
 
     <div class="nav-right">
-        <a href="#" style="color: white;">
+        <!-- Notification Bell with Dropdown -->
+        <div class="notification-icon" onclick="toggleNotifications()">
             <i class="fa fa-bell"></i>
-        </a>
+            {% if pending_requests_count > 0 %}
+            <span class="notification-badge">{{ pending_requests_count }}</span>
+            {% endif %}
+            
+            <!-- Notification Dropdown -->
+            <div class="notification-dropdown" id="notificationDropdown">
+                <div class="notification-header">
+                    <i class="fas fa-user-plus"></i> Follow Requests
+                </div>
+                <div id="notificationList">
+                    {% if pending_requests %}
+                        {% for request in pending_requests %}
+                        <div class="notification-item unread" id="notif-{{ request.id }}">
+                            <div class="notification-content">
+                                <div class="notification-text">
+                                    <strong>@{{ request.from_user }}</strong> wants to follow you
+                                </div>
+                                <div class="notification-time">
+                                    {{ request.created_at|timesince }} ago
+                                </div>
+                            </div>
+                            <div class="notification-actions">
+                                <button class="notif-approve-btn" onclick="handleRequestFromNotif({{ request.id }}, 'approve')">
+                                    ✓
+                                </button>
+                                <button class="notif-reject-btn" onclick="handleRequestFromNotif({{ request.id }}, 'reject')">
+                                    ✗
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-notifications">
+                            <i class="fas fa-inbox"></i>
+                            <p>No follow requests</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
         <a href="#" style="color: white;">
             <i class="fa fa-comment"></i>
         </a>
+        
         <a href="{% url 'saved_posts' %}" style="color: white;">
             <i class="fa fa-bookmark"></i>
         </a>
+        
         <img src="{{user_profile.profileimage.url}}" class="nav-avatar" alt="Avatar">
         <a href="{% url 'logout' %}" class="logout" onclick="return confirm('Logout?')">🚪 Logout</a>
     </div>
@@ -294,6 +468,15 @@
             <h3>{{user.username}}</h3>
             <p>@{{user.username}}</p>
             <p style="font-size: 12px; color: gray;">{{user_profile.bio|truncatewords:15}}</p>
+            
+            <!-- Privacy Badge -->
+            <div style="margin: 5px 0;">
+                {% if user_profile.is_private %}
+                    <span class="privacy-badge privacy-private"><i class="fas fa-lock"></i> Private Account</span>
+                {% else %}
+                    <span class="privacy-badge privacy-public"><i class="fas fa-globe"></i> Public Account</span>
+                {% endif %}
+            </div>
 
             <div class="stats">
                 <div><b>{{user_posts_count}}</b><span>Posts</span></div>
@@ -307,6 +490,11 @@
         <!-- Quick Links -->
         <div class="card links">
             <p>📌 <a href="{% url 'saved_posts' %}">Saved Posts</a></p>
+            <p>👥 <a href="{% url 'pending_requests' %}">Follow Requests 
+                {% if pending_requests_count > 0 %}
+                <span style="background: #ff007f; padding: 2px 6px; border-radius: 10px; font-size: 10px;">{{ pending_requests_count }}</span>
+                {% endif %}
+            </a></p>
             <p>💬 <a href="#">Messages</a></p>
             <p>🔔 <a href="#">Notifications</a></p>
             <p>⚙️ <a href="{% url 'settings' %}">Settings</a></p>
@@ -369,7 +557,6 @@
                     </button>
                 </form>
 
-                <!-- Share Button -->
                 <a href="#" class="share-btn">
                     🔄 Share
                 </a>
@@ -382,7 +569,6 @@
                 <button type="submit">Post</button>
             </form>
 
-            
             {% with post.comments.all|slice:":2" as recent_comments %}
                 {% if recent_comments %}
                     <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #1c1c1c;">
@@ -409,27 +595,27 @@
 
     </div>
 
-  
+    <!-- RIGHT SIDEBAR -->
     <div class="sidebar">
 
-        
+        <!-- Suggestions -->
         <div class="card">
             <h4>👥 Suggested for you</h4>
             
             {% if suggestions_username_profile_list %}
                 {% for suggestion in suggestions_username_profile_list %}
                 <div class="suggestion">
-
                     <div class="user">
                         <img src="{{suggestion.profileimage.url}}" alt="Avatar">
                         <div>
                             <p style="font-weight: bold;">{{suggestion.user}}</p>
                             <small>{{suggestion.bio|truncatewords:5}}</small>
+                            {% if suggestion.is_private %}
+                                <span style="font-size: 9px; color: #ff007f;">🔒 Private</span>
+                            {% endif %}
                         </div>
                     </div>
-
-                    <a href="{% url 'profile' suggestion.user %}">Follow+</a>
-
+                    <a href="{% url 'profile' suggestion.user %}">View Profile</a>
                 </div>
                 {% endfor %}
             {% else %}
@@ -437,6 +623,7 @@
             {% endif %}
         </div>
 
+        <!-- Activity Card -->
         <div class="card activity-card">
             <h4>⏱️ Your Activity</h4>
             
@@ -463,8 +650,6 @@
                     {% endif %}
                 </span>
             </div>
-            
-            
         </div>
 
         <!-- Footer Info -->
@@ -479,6 +664,128 @@
 
 <!-- JavaScript for Interactive Elements -->
 <script>
+    // Get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    const csrftoken = getCookie('csrftoken');
+    
+    // Toggle notification dropdown
+    function toggleNotifications() {
+        const dropdown = document.getElementById('notificationDropdown');
+        dropdown.classList.toggle('show');
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const notificationIcon = document.querySelector('.notification-icon');
+        const dropdown = document.getElementById('notificationDropdown');
+        
+        if (notificationIcon && !notificationIcon.contains(event.target)) {
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+        }
+    });
+    
+    // Handle request from notification
+    function handleRequestFromNotif(requestId, action) {
+        const url = action === 'approve' 
+            ? `/approve-request/${requestId}/` 
+            : `/reject-request/${requestId}/`;
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the notification item
+                const notifItem = document.getElementById(`notif-${requestId}`);
+                if (notifItem) {
+                    notifItem.remove();
+                    
+                    // Update badge count
+                    const badge = document.querySelector('.notification-badge');
+                    const currentCount = parseInt(badge?.textContent || 0);
+                    
+                    if (currentCount > 1) {
+                        if (badge) badge.textContent = currentCount - 1;
+                    } else {
+                        if (badge) badge.style.display = 'none';
+                    }
+                    
+                    // Check if no more notifications
+                    const remainingNotifs = document.querySelectorAll('.notification-item').length;
+                    if (remainingNotifs === 0) {
+                        const notificationList = document.getElementById('notificationList');
+                        if (notificationList) {
+                            notificationList.innerHTML = `
+                                <div class="empty-notifications">
+                                    <i class="fas fa-inbox"></i>
+                                    <p>No follow requests</p>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+                
+                showToast(`Request ${action === 'approve' ? 'approved' : 'rejected'}!`, 'success');
+            } else {
+                showToast(data.message || 'Something went wrong', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Network error. Please try again.', 'error');
+        });
+    }
+    
+    // Show toast message
+    function showToast(message, type) {
+        let toast = document.getElementById('toastMessage');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toastMessage';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+            `;
+            document.body.appendChild(toast);
+        }
+        
+        toast.textContent = message;
+        toast.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
+        toast.style.display = 'block';
+        
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+    
     // Auto-hide flash messages after 3 seconds
     setTimeout(function() {
         var messages = document.querySelectorAll('.message');
@@ -511,6 +818,22 @@
             e.preventDefault();
         }
     });
+    
+    // Add CSS animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    `;
+    document.head.appendChild(style);
 </script>
 
 </body>
