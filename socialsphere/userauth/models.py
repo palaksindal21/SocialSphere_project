@@ -25,12 +25,12 @@ class Profile(models.Model):
     def age(self):
             if self.birth_date:
                 today = timezone.now().date()
-                return today.year - self.birth_date.year - ((today.month, today.day)>(self.birth_date.month, self.birth_date.day))
+                return today.year - self.birth_date.year - ((today.month, today.day)<(self.birth_date.month, self.birth_date.day))
             return None
     
     @property
     def is_minor(self):
-        return self.age and self.age<18
+        return self.age and self.age < 20
     
     def get_followers_count(self):
         return FollowersCount.objects.filter(user=self.user, is_accepted=True).count()
@@ -75,8 +75,47 @@ class Profile(models.Model):
     
     def get_following(self):
         return FollowersCount.objects.filter(follower=self.user, is_accepted=True)
-
+    
+    def get_daily_limit_minutes(self):
+        if self.is_minor:
+            return 240
+        return None
+    
+    def get_today_usage_minutes(self):
+        today = timezone.now().date()
+        daily_record = DailyTimeSpent.objects.filter(user = self.user.username, date = today).first()
+        return daily_record.total_minutes if daily_record else 0
+    
+    def get_remaining_minutes_today(self):
+        limit = self.get_daily_limit_minutes()
+        if limit is None:
+            return None
         
+        used = self.get_today_usage_minutes()
+        remaining = limit - used
+        return max(0, remaining)
+      
+    def has_exceeded_daily_limit(self):
+        limit = self.get_daily_limit_minutes()
+        if limit is None:
+            return False
+    
+        used = self.get_today_usage_minutes()
+        return used >= limit
+    
+    def add_usage_minutes(self, minutes):
+        if minutes <= 0:
+            return
+    
+        today = timezone.now().date()
+        daily_record, created = DailyTimeSpent.objects.get_or_create(
+            user=self.user.username,
+            date=today,
+            defaults={'total_minutes': 0}
+        )
+        daily_record.total_minutes += minutes
+        daily_record.save()
+
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     user = models.CharField(max_length=100)
@@ -257,3 +296,80 @@ class SavedPost(models.Model):
         except User.DoesNotExist:
             return None
     
+class ActiveSession(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    session_start = models.DateTimeField(auto_now_add=True)
+    last_activity = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+
+    def get_session_duration_minutes(self):
+        if self.is_active:
+            duration_seconds = (timezone.now() - self.session_start).total_seconds()
+            return int(duration_seconds // 60)
+        return 0
+    
+    def __str__(self):
+        return f"{self.user.username} - Active since {self.session_start}"
+    
+
+
+class ChatRoom(models.Model):
+    ROOM_TYPES = [
+        ('direct', 'Direct Message'),      # 1-on-1 chat
+        ('group', 'Group Chat'),           # Multiple users
+    ]
+
+    room_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    room_name = models.CharField(max_length=225, unique=True)
+    room_type = models.CharField(max_length=20, choices=ROOM_TYPES, default='direct')
+    participants = models.ManyToManyField(User, related_name='chat_rooms')
+    last_message = models.TextField(blank=True, null=True)
+    last_message_time = models.DateTimeField(null=True, blank=True)
+    last_message_sender = models.CharField(max_length=150, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return f"{self.room_name} ({self.room_type})"
+    
+    def update_last_message(self, message, sender):
+        """Update last message preview"""
+        self.last_message = message[:100]
+        self.last_message_time = timezone.now()
+        self.last_message_sender = sender
+        self.save()
+
+
+class ChatMessage(models.Model):
+    MESSAGE_TYPES = [
+        ('text', 'Text'),
+        ('image', 'Image'),
+        ('post_share', 'Shared Post'),
+    ]
+
+    message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name='messages')
+    sender = models.CharField(max_length=150) 
+    message_type = models.CharField(max_length=20, choices=MESSAGE_TYPES, default='text')
+    message = models.TextField()
+    shared_post_id = models.CharField(max_length=500, blank=True, null=True)
+    shared_post_image = models.CharField(max_length=500, blank=True, null=True)
+    shared_post_caption = models.TextField(blank=True, null=True)
+    is_read = models.BooleanField(default=False)
+    is_delivered = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+    
+    def __str__(self):
+        return f"{self.sender}: {self.message[:50]}"
+    
+    def mark_as_read(self):
+        """Mark message as read"""
+        self.is_read = True
+        self.save()
+

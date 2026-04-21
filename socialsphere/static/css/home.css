@@ -444,3 +444,472 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #ff4d4d;
 }
+
+.save-btn {
+        background: none;
+        border: none;
+        color: #ff007f;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s;
+    }
+    
+    .save-btn:hover {
+        transform: scale(1.05);
+        color: #ff4d4d;
+    }
+    
+    .logout {
+        color: #ff007f;
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.3s;
+    }
+    
+    .logout:hover {
+        color: #ff4d4d;
+    }
+    
+    .links a {
+        color: #ff007f;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    
+    .links a:hover {
+        color: #ff4d4d;
+    }
+    
+    .suggestion a {
+        color: #ff007f;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    .suggestion a:hover {
+        color: #ff4d4d;
+    }
+    
+    .actions {
+        display: flex;
+        gap: 15px;
+        margin: 10px 0;
+    }
+    
+    .actions a {
+        color: #ff007f;
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.3s;
+    }
+    
+    .actions a:hover {
+        color: #ff4d4d;
+    }
+    
+    .create-top {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .create-top img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+    }
+    
+    .create-top input {
+        flex: 1;
+        background: #1c1c1c;
+        border: none;
+        border-radius: 20px;
+        padding: 10px 15px;
+        color: white;
+    }
+    
+    .create-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .create-bottom input[type="file"] {
+        flex: 1;
+        color: gray;
+        font-size: 12px;
+    }
+    
+    .create-bottom button {
+        background: linear-gradient(to right, #ff007f, #ff4d4d);
+        border: none;
+        padding: 8px 20px;
+        border-radius: 20px;
+        color: white;
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+    
+    .create-bottom button:hover {
+        transform: scale(1.05);
+    }
+    
+    .caption {
+        margin: 10px 0;
+        font-size: 14px;
+    }
+    
+    .search-box {
+        display: flex;
+        gap: 5px;
+    }
+    
+    .search-box button {
+        background: #ff007f;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        cursor: pointer;
+        color: white;
+        transition: transform 0.3s;
+    }
+    
+    .search-box button:hover {
+        transform: scale(1.05);
+    }
+    
+    .nav-right {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        position: relative;
+    }
+    
+    .nav-right i {
+        font-size: 20px;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    
+    .nav-right i:hover {
+        color: #ff007f;
+    }
+    
+    /* Notification Dropdown Styles */
+    .notification-icon {
+        position: relative;
+        cursor: pointer;
+    }
+    
+    .notification-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #ff007f;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 10px;
+        min-width: 18px;
+        text-align: center;
+    }
+    
+    .notification-dropdown {
+        display: none;
+        position: absolute;
+        top: 40px;
+        right: 0;
+        width: 350px;
+        max-height: 400px;
+        overflow-y: auto;
+        background: #1a1a1a;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        z-index: 1000;
+        border: 1px solid #333;
+    }
+    
+    .notification-dropdown.show {
+        display: block;
+    }
+    
+    .notification-header {
+        padding: 12px 15px;
+        border-bottom: 1px solid #333;
+        font-weight: bold;
+        color: #ff007f;
+    }
+    
+    .notification-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid #2a2a2a;
+        cursor: pointer;
+        transition: background 0.3s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .notification-item:hover {
+        background: #252525;
+    }
+    
+    .notification-item.unread {
+        background: #2a1a2a;
+    }
+    
+    .notification-content {
+        flex: 1;
+    }
+    
+    .notification-text {
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+    
+    .notification-time {
+        font-size: 10px;
+        color: #666;
+    }
+    
+    .notification-actions {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .notif-approve-btn, .notif-reject-btn {
+        padding: 4px 12px;
+        border-radius: 5px;
+        font-size: 11px;
+        cursor: pointer;
+        border: none;
+    }
+    
+    .notif-approve-btn {
+        background: #10b981;
+        color: white;
+    }
+    
+    .notif-reject-btn {
+        background: #ef4444;
+        color: white;
+    }
+    
+    .empty-notifications {
+        padding: 30px;
+        text-align: center;
+        color: #666;
+    }
+    
+    .comment-box button {
+        background: linear-gradient(to right, #ff007f, #ff4d4d);
+        border: none;
+        border-radius: 20px;
+        padding: 5px 15px;
+        margin-left: 5px;
+        cursor: pointer;
+        color: white;
+    }
+    
+    /* Time Tracker Card Styles */
+    .time-tracker-card {
+        margin-bottom: 20px;
+    }
+    
+    .time-tracker-card h4 {
+        color: #ff007f;
+        margin-bottom: 15px;
+        font-size: 16px;
+        text-align: center;
+    }
+    
+    .time-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        gap: 10px;
+    }
+    
+    .time-stat-item {
+        flex: 1;
+        text-align: center;
+        background: #1a1a1a;
+        padding: 10px;
+        border-radius: 10px;
+    }
+    
+    .time-stat-value {
+        font-size: 20px;
+        font-weight: bold;
+        color: #ff007f;
+    }
+    
+    .time-stat-label {
+        font-size: 10px;
+        color: #888;
+        margin-top: 5px;
+    }
+    
+    .progress-bar-container {
+        margin: 15px 0;
+    }
+    
+    .progress-bar-bg {
+        background: #333;
+        border-radius: 10px;
+        height: 8px;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ff007f, #ff4d4d);
+        width: 0%;
+        transition: width 0.3s ease;
+        border-radius: 10px;
+    }
+    
+    .time-warning {
+        font-size: 11px;
+        padding: 8px;
+        border-radius: 8px;
+        text-align: center;
+        margin-top: 10px;
+    }
+    
+    .time-warning.normal {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+    
+    .time-warning.low {
+        background: rgba(245, 158, 11, 0.2);
+        color: #f59e0b;
+    }
+    
+    .time-warning.exhausted {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+    }
+    
+    .no-limit-badge {
+        text-align: center;
+        padding: 20px;
+        background: #1a1a1a;
+        border-radius: 10px;
+        color: #10b981;
+    }
+    
+    .no-limit-badge i {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    
+    /* Activity Card Styles */
+    .activity-card {
+        margin-bottom: 20px;
+    }
+    
+    .activity-card h4 {
+        color: #ff007f;
+        margin-bottom: 15px;
+        font-size: 16px;
+        text-align: center;
+    }
+    
+    .activity-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+    }
+    
+    .activity-divider {
+        height: 1px;
+        background: #2a2a2a;
+        margin: 5px 0;
+    }
+    
+    .activity-label {
+        color: #8e8e8e;
+        font-size: 14px;
+    }
+    
+    .activity-value {
+        color: #ff007f;
+        font-size: 18px;
+        font-weight: bold;
+    }
+    
+    .activity-link {
+        display: block;
+        text-align: center;
+        padding: 8px;
+        background: #1a1a1a;
+        color: #ff007f;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 12px;
+        transition: all 0.3s;
+        margin-top: 10px;
+    }
+    
+    .activity-link:hover {
+        background: #ff007f;
+        color: white;
+    }
+    
+    /* Privacy Badge */
+    .privacy-badge {
+        display: inline-block;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-left: 5px;
+    }
+    
+    .privacy-public {
+        background: #10b981;
+        color: white;
+    }
+    
+    .privacy-private {
+        background: #ff007f;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .container {
+            grid-template-columns: 1fr;
+        }
+        
+        .navbar {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .search-box {
+            width: 100%;
+        }
+        
+        .search-box input {
+            flex: 1;
+        }
+        
+        .notification-dropdown {
+            width: 300px;
+            right: -50px;
+        }
+        
+        .time-stats {
+            flex-direction: column;
+            gap: 8px;
+        }
+    }

@@ -33,5 +33,10 @@ urlpatterns = [
     path('pending-requests/', views.pending_requests_view, name='pending_requests'),
     path('toggle-privacy/', views.toggle_privacy_view, name='toggle_privacy'),
     path('pending-requests/count/', views.pending_requests_count, name='pending_requests_count'),
-
+    path('api/remaining-time/', views.get_remaining_time, name='remaining_time'),
+    path('chats/', views.chat_list, name='chat_list'),
+    path('chat/<str:username>/', views.chat_room, name='chat_room'),
+    path('get-or-create-chat/', views.get_or_create_chat, name='get_or_create_chat'),
+    path('get-user-chats/', views.get_user_chats, name='get_user_chats'),
+    path('get-people-to-connect/', views.get_people_to_connect, name='get_people_to_connect'),
 ]

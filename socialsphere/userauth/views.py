@@ -6,6 +6,7 @@ from itertools import chain
 from django.contrib.auth.decorators import login_required
 from . models import *
 import random
+import json
 from datetime import date, datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
@@ -178,7 +179,13 @@ def signup(request):
                 new_profile.save()
 
                 UserSession.objects.create(user=username, login_time=timezone.now())
-                messages.success(request, 'Account created successfully!')
+
+                if new_profile.is_minor:
+                    limit_hours = new_profile.get_daily_limit_minutes() // 60
+                    messages.info(request, f'Account created successfully! Note: As a minor (under 20), 'f'you have a daily limit of {limit_hours} hours.')
+                else:    
+                    messages.success(request, 'Account created successfully!')
+
                 return redirect('settings')
         
         else:
@@ -209,27 +216,87 @@ def signin(request):
         user = auth.authenticate(username=username, password=password)
 
         if user is not None:
+            try:
+                profile = Profile.objects.get(user=user)
+            
+                if profile.is_minor and profile.has_exceeded_daily_limit():
+                    remaining = profile.get_remaining_minutes_today()
+                    limit_hours = profile.get_daily_limit_minutes() // 60
+                    
+                    messages.error(request, f'⏰ You have reached your daily limit of {limit_hours} hours.\n'f'Please come back tomorrow. (Limit resets at midnight)')
+                    return redirect('signin')
+                elif profile.is_minor:
+                    remaining = profile.get_remaining_minutes_today()
+                    if remaining < 30 and remaining > 0:
+                        messages.warning(request,f'⚠️ You have only {remaining} minutes left today!')
+                    
+            except Profile.DoesNotExist:
+                pass
+
             auth.login(request, user)
+ # Create active session for time tracking (for middleware)
+            try:
+                from .models import ActiveSession
+                ActiveSession.objects.get_or_create(user=user,defaults={'session_start': timezone.now(), 'is_active': True})
+            except:
+                pass 
 
-            UserSession.objects.create(
-                user=username,
-                login_time=timezone.now()
-            )
+            UserSession.objects.create(user=username,login_time=timezone.now())         
+
+            # Show welcome message with time info for minors
+            try:
+                profile = Profile.objects.get(user=user)
+                if profile.is_minor:
+                    remaining = profile.get_remaining_minutes_today()
+                    limit_hours = profile.get_daily_limit_minutes() // 60
+                    if remaining > 0:
+                        messages.success(
+                            request, 
+                            f'Welcome back! You have {remaining} minutes remaining today (out of {limit_hours} hours)'
+                        )
+                    else:
+                        messages.success(request, f'Welcome back!')
+                else:
+                    messages.success(request, f'Welcome back, {username}!')
+            except:
+                messages.success(request, f'Welcome back, {username}!')
+            
             return redirect('home')
-
+            
         else:
-            messages.info(request, 'Credentials Invalid!!')
+            messages.error(request, 'Invalid username or password!')
             return redirect('signin')
     else:
         hashkey = CaptchaStore.generate_key()
         captcha_image = captcha_image_url(hashkey)
-        return render(request, 'signin.html',{'captcha_hashkey': hashkey, 'captcha_image': captcha_image}) 
+        return render(request, 'signin.html', {'captcha_hashkey': hashkey, 'captcha_image': captcha_image})
+ 
     
 
 # Logout
 @login_required(login_url='signin')
 def logout(request):
     username = request.user.username
+    #  NEW: Track final session time from ActiveSession 
+    try:
+        from .models import ActiveSession
+        active_session = ActiveSession.objects.get(user=request.user)
+        
+        if active_session.is_active:
+            final_minutes = active_session.get_session_duration_minutes()
+            
+            if final_minutes > 0:
+                profile = Profile.objects.get(user=request.user)
+                profile.add_usage_minutes(final_minutes)
+
+            active_session.is_active = False
+        active_session.save()
+        
+    except ActiveSession.DoesNotExist:
+        pass
+    except Profile.DoesNotExist:
+        pass
+
     current_session = UserSession.objects.filter(user=username, logout_time__isnull=True).first()
 
     if current_session:
@@ -241,8 +308,8 @@ def logout(request):
         if minutes_spent > 0:
             today = timezone.now().date()
             daily_record, created_at = DailyTimeSpent.objects.get_or_create(
-                user = username,
-                date = today,
+                user=username,
+                date=today,
                 defaults={'total_minutes': 0}
             )
             daily_record.total_minutes += minutes_spent
@@ -257,6 +324,25 @@ def auto_logout(request):
     if request.user.is_authenticated:
         username = request.user.username
         
+        try:
+            from .models import ActiveSession
+            active_session = ActiveSession.objects.get(user=request.user)
+            
+            if active_session.is_active:
+                final_minutes = active_session.get_session_duration_minutes()
+                
+                if final_minutes > 0:
+                    profile = Profile.objects.get(user=request.user)
+                    profile.add_usage_minutes(final_minutes)
+            
+            active_session.is_active = False
+            active_session.save()
+            
+        except ActiveSession.DoesNotExist:
+            pass
+        except Profile.DoesNotExist:
+            pass
+
         current_session = UserSession.objects.filter(
             user=username,
             logout_time__isnull=True
@@ -770,3 +856,200 @@ def toggle_privacy_view(request):
 def pending_requests_count(request):
     count = FollowRequest.objects.filter(to_user=request.user.username, status='pending').count()
     return JsonResponse({'count': count})
+
+
+@login_required(login_url='signin')
+def get_remaining_time(request):
+    try:
+        profile = Profile.objects.get(user=request.user)
+
+        if profile.is_minor:
+            remaining_minutes = profile.get_remaining_minutes_today()
+            used_minutes = profile.get_today_usage_minutes()
+            limit_minutes = profile.get_daily_limit_minutes()
+
+            remaining_hours = remaining_minutes // 60
+            remaining_mins = remaining_minutes % 60
+            used_hours = used_minutes // 60
+            used_mins = used_minutes % 60
+
+            percent_used = (used_minutes / limit_minutes * 100) if limit_minutes > 0 else 0
+
+            return JsonResponse({
+                'success': True,
+                'has_limit': True,
+                'is_minor': True,
+                'age': profile.age,
+                'remaining_minutes': remaining_minutes,
+                'remaining_hours': remaining_hours,
+                'remaining_mins': remaining_mins,
+                'used_minutes': used_minutes,
+                'used_hours': used_hours,
+                'used_mins': used_mins,
+                'limit_minutes': limit_minutes,
+                'limit_hours': limit_minutes // 60,
+                'percent_used': round(percent_used, 1),
+            })
+        
+        else:
+            return JsonResponse({
+                'success': True,
+                'has_limit': False,
+                'is_minor': False,
+                'age': profile.age,
+                'message': 'No time limit for users over 20'
+            })
+        
+    except Profile.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Profile not found'
+        }, status=404)
+
+
+
+@login_required
+def chat_list(request):
+    chat_rooms = request.user.chat_rooms.all()
+
+    chats_data = []
+    for room in chat_rooms:
+        other_user = None
+        if room.room_type == 'direct':
+            for user in room.participants.all():
+                if user != request.user:
+                    other_user = user
+                    break
+
+        chats_data.append({
+            'room': room,
+            'other_user': other_user,
+            'last_message': room.last_message,
+            'last_message_time': room.last_message_time,
+            'last_message_sender': room.last_message_sender,
+        })
+    return render(request, 'chat_list.html', {'chats': chats_data})
+
+
+@login_required
+def chat_room(request, username):
+    other_user = get_object_or_404(User, username=username)
+    usernames = sorted([request.user.username, username])
+    room_name = f"{usernames[0]}_{usernames[1]}"
+
+    room, created = ChatRoom.objects.get_or_create(
+        room_name=room_name,
+        defaults={'room_type': 'direct'}
+    )
+
+    if created:
+        room.participants.add(request.user, other_user)
+    else:
+        if request.user not in room.participants.all():
+            room.participants.add(request.user)
+        if other_user not in room.participants.all():
+            room.participants.add(other_user)
+
+    messages = ChatMessage.objects.filter(room=room).order_by('created_at')[:50]
+    
+    print(f"=" * 50)
+    print(f"Chat Room: {room_name}")
+    print(f"Current User: {request.user.username}")
+    print(f"Other User: {other_user.username}")
+    print(f"Messages Found: {messages.count()}")
+    for msg in messages:
+        print(f"  - {msg.sender}: {msg.message[:50]}")
+    print(f"=" * 50)
+    context = {
+        'room_name': room_name,
+        'other_user': other_user,
+        'messages': messages,
+        'room': room,
+    }
+    
+    return render(request, 'chat_room.html', context)
+
+@login_required
+def get_or_create_chat(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username')
+
+        try:
+            other_user = User.objects.get(username=username)
+            usernames = sorted([request.user.username, username])
+            room_name = f"{usernames[0]}_{usernames[1]}"
+            
+            room, created = ChatRoom.objects.get_or_create(
+                room_name=room_name,
+                defaults={'room_type': 'direct'}
+            )
+            
+            if created:
+                room.participants.add(request.user, other_user)
+            
+            return JsonResponse({
+                'success': True,
+                'room_name': room_name,
+                'created': created
+            })
+        
+        except User.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'User not found'})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+
+@login_required
+def get_user_chats(request):
+    """Get list of users the current user has chatted with"""
+    chat_rooms = request.user.chat_rooms.filter(room_type='direct')
+    users = []
+    for room in chat_rooms:
+        for participant in room.participants.all():
+            if participant != request.user:
+                users.append({
+                    'username': participant.username,
+                    'room_name': room.room_name
+                })
+    return JsonResponse({'chats': users})
+
+
+@login_required
+def get_people_to_connect(request):
+    existing_chat_users = set()
+    chat_rooms = request.user.chat_rooms.filter(room_type='direct')
+    for room in chat_rooms:
+        for participant in room.participants.all():
+            if participant != request.user:
+                existing_chat_users.add(participant.username)
+    
+    print(f"Existing chat users: {existing_chat_users}")
+    all_users = User.objects.exclude(username=request.user.username)
+    all_users = all_users.exclude(username__in=existing_chat_users)
+    
+    print(f"Total other users: {all_users.count()}")
+    
+    # If no users found, get any 5 users (for testing)
+    if all_users.count() == 0:
+        # Get any 5 users except current user
+        all_users = User.objects.exclude(username=request.user.username)[:5]
+        print(f"Fallback: showing {all_users.count()} users")
+    
+    # Limit to 10 suggestions
+    suggested_users = all_users[:10]
+    
+    # Get profile data
+    users_data = []
+    for user in suggested_users:
+        profile = Profile.objects.filter(user=user).first()
+        users_data.append({
+            'username': user.username,
+            'bio': profile.bio if profile and profile.bio else 'No bio',
+            'avatar': profile.profileimage.url if profile and profile.profileimage else '/static/images/blankprofile.jpg',
+            'is_private': profile.is_private if profile else False
+        })
+    
+    print(f"Returning {len(users_data)} users")
+    
+    return JsonResponse({'users': users_data})

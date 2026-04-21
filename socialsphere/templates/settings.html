@@ -579,7 +579,7 @@
     <div class="toggle-item">
         <div class="toggle-info">
             <h4><i class="fas fa-hourglass-half"></i> Daily Usage Limit</h4>
-            <p>2 hours per day for users under 20</p>
+            <p>3 hours per day for users under 20</p>
         </div>
         {% if user_profile.is_minor %}
             <span style="color: #ff007f;">Active (Under 20)</span>
@@ -650,16 +650,6 @@
 <!-- DANGER ZONE -->
 <div class="setting-card" style="border-color: rgba(239,68,68,0.3);">
     <h3 style="color: #ef4444;"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
-    
-    <div class="toggle-item">
-        <div class="toggle-info">
-            <h4><i class="fas fa-user-slash"></i> Deactivate Account</h4>
-            <p>Temporarily hide your account from others</p>
-        </div>
-        <button type="button" class="btn-outline" onclick="showDeactivateModal()" style="border-color: #ef4444; color: #ef4444;">
-            Deactivate
-        </button>
-    </div>
     
     <div class="toggle-item">
         <div class="toggle-info">

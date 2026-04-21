@@ -10,174 +10,22 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
-    /* Additional modern styles */
-    .save-btn {
-        background: none;
-        border: none;
+    /* Additional styles for chat link */
+    .chat-link {
         color: #ff007f;
-        cursor: pointer;
-        font-size: 14px;
         text-decoration: none;
-        display: inline-flex;
+        transition: color 0.3s;
+        display: flex;
         align-items: center;
-        gap: 5px;
-        transition: all 0.3s;
+        gap: 8px;
     }
     
-    .save-btn:hover {
-        transform: scale(1.05);
+    .chat-link:hover {
         color: #ff4d4d;
     }
     
-    .logout {
-        color: #ff007f;
-        text-decoration: none;
-        font-size: 14px;
-        transition: color 0.3s;
-    }
-    
-    .logout:hover {
-        color: #ff4d4d;
-    }
-    
-    .links a {
-        color: #ff007f;
-        text-decoration: none;
-        transition: color 0.3s;
-    }
-    
-    .links a:hover {
-        color: #ff4d4d;
-    }
-    
-    .suggestion a {
-        color: #ff007f;
-        text-decoration: none;
-        font-size: 12px;
-        font-weight: bold;
-    }
-    
-    .suggestion a:hover {
-        color: #ff4d4d;
-    }
-    
-    .actions {
-        display: flex;
-        gap: 15px;
-        margin: 10px 0;
-    }
-    
-    .actions a {
-        color: #ff007f;
-        text-decoration: none;
-        font-size: 14px;
-        transition: color 0.3s;
-    }
-    
-    .actions a:hover {
-        color: #ff4d4d;
-    }
-    
-    .create-top {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-    
-    .create-top img {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-    }
-    
-    .create-top input {
-        flex: 1;
-        background: #1c1c1c;
-        border: none;
-        border-radius: 20px;
-        padding: 10px 15px;
-        color: white;
-    }
-    
-    .create-bottom {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .create-bottom input[type="file"] {
-        flex: 1;
-        color: gray;
-        font-size: 12px;
-    }
-    
-    .create-bottom button {
-        background: linear-gradient(to right, #ff007f, #ff4d4d);
-        border: none;
-        padding: 8px 20px;
-        border-radius: 20px;
-        color: white;
-        cursor: pointer;
-        transition: transform 0.3s;
-    }
-    
-    .create-bottom button:hover {
-        transform: scale(1.05);
-    }
-    
-    .caption {
-        margin: 10px 0;
-        font-size: 14px;
-    }
-    
-    .search-box {
-        display: flex;
-        gap: 5px;
-    }
-    
-    .search-box button {
-        background: #ff007f;
-        border: none;
-        border-radius: 50%;
-        width: 35px;
-        height: 35px;
-        cursor: pointer;
-        color: white;
-        transition: transform 0.3s;
-    }
-    
-    .search-box button:hover {
-        transform: scale(1.05);
-    }
-    
-    .nav-right {
-        display: flex;
-        gap: 20px;
-        align-items: center;
-        position: relative;
-    }
-    
-    .nav-right i {
-        font-size: 20px;
-        cursor: pointer;
-        transition: color 0.3s;
-    }
-    
-    .nav-right i:hover {
-        color: #ff007f;
-    }
-    
-    /* Notification Dropdown Styles */
-    .notification-icon {
-        position: relative;
-        cursor: pointer;
-    }
-    
-    .notification-badge {
-        position: absolute;
-        top: -8px;
-        right: -8px;
+    /* Messages badge */
+    .message-badge {
         background: #ff007f;
         color: white;
         border-radius: 50%;
@@ -185,200 +33,6 @@
         font-size: 10px;
         min-width: 18px;
         text-align: center;
-    }
-    
-    .notification-dropdown {
-        display: none;
-        position: absolute;
-        top: 40px;
-        right: 0;
-        width: 350px;
-        max-height: 400px;
-        overflow-y: auto;
-        background: #1a1a1a;
-        border-radius: 10px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-        z-index: 1000;
-        border: 1px solid #333;
-    }
-    
-    .notification-dropdown.show {
-        display: block;
-    }
-    
-    .notification-header {
-        padding: 12px 15px;
-        border-bottom: 1px solid #333;
-        font-weight: bold;
-        color: #ff007f;
-    }
-    
-    .notification-item {
-        padding: 12px 15px;
-        border-bottom: 1px solid #2a2a2a;
-        cursor: pointer;
-        transition: background 0.3s;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .notification-item:hover {
-        background: #252525;
-    }
-    
-    .notification-item.unread {
-        background: #2a1a2a;
-    }
-    
-    .notification-content {
-        flex: 1;
-    }
-    
-    .notification-text {
-        font-size: 13px;
-        margin-bottom: 5px;
-    }
-    
-    .notification-time {
-        font-size: 10px;
-        color: #666;
-    }
-    
-    .notification-actions {
-        display: flex;
-        gap: 8px;
-    }
-    
-    .notif-approve-btn, .notif-reject-btn {
-        padding: 4px 12px;
-        border-radius: 5px;
-        font-size: 11px;
-        cursor: pointer;
-        border: none;
-    }
-    
-    .notif-approve-btn {
-        background: #10b981;
-        color: white;
-    }
-    
-    .notif-reject-btn {
-        background: #ef4444;
-        color: white;
-    }
-    
-    .empty-notifications {
-        padding: 30px;
-        text-align: center;
-        color: #666;
-    }
-    
-    .comment-box button {
-        background: linear-gradient(to right, #ff007f, #ff4d4d);
-        border: none;
-        border-radius: 20px;
-        padding: 5px 15px;
-        margin-left: 5px;
-        cursor: pointer;
-        color: white;
-    }
-    
-    /* Activity Card Styles */
-    .activity-card {
-        margin-bottom: 20px;
-    }
-    
-    .activity-card h4 {
-        color: #ff007f;
-        margin-bottom: 15px;
-        font-size: 16px;
-        text-align: center;
-    }
-    
-    .activity-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 0;
-    }
-    
-    .activity-divider {
-        height: 1px;
-        background: #2a2a2a;
-        margin: 5px 0;
-    }
-    
-    .activity-label {
-        color: #8e8e8e;
-        font-size: 14px;
-    }
-    
-    .activity-value {
-        color: #ff007f;
-        font-size: 18px;
-        font-weight: bold;
-    }
-    
-    .activity-link {
-        display: block;
-        text-align: center;
-        padding: 8px;
-        background: #1a1a1a;
-        color: #ff007f;
-        text-decoration: none;
-        border-radius: 8px;
-        font-size: 12px;
-        transition: all 0.3s;
-        margin-top: 10px;
-    }
-    
-    .activity-link:hover {
-        background: #ff007f;
-        color: white;
-    }
-    
-    /* Privacy Badge */
-    .privacy-badge {
-        display: inline-block;
-        font-size: 10px;
-        padding: 2px 6px;
-        border-radius: 10px;
-        margin-left: 5px;
-    }
-    
-    .privacy-public {
-        background: #10b981;
-        color: white;
-    }
-    
-    .privacy-private {
-        background: #ff007f;
-        color: white;
-    }
-    
-    @media (max-width: 768px) {
-        .container {
-            grid-template-columns: 1fr;
-        }
-        
-        .navbar {
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .search-box {
-            width: 100%;
-        }
-        
-        .search-box input {
-            flex: 1;
-        }
-        
-        .notification-dropdown {
-            width: 300px;
-            right: -50px;
-        }
     }
 </style>
 </head>
@@ -443,8 +97,12 @@
             </div>
         </div>
         
-        <a href="#" style="color: white;">
+        <!-- Messages Link with Badge -->
+        <a href="{% url 'chat_list' %}" style="color: white; position: relative;">
             <i class="fa fa-comment"></i>
+            {% if unread_messages_count > 0 %}
+            <span class="notification-badge" style="top: -8px; right: -8px;">{{ unread_messages_count }}</span>
+            {% endif %}
         </a>
         
         <a href="{% url 'saved_posts' %}" style="color: white;">
@@ -495,7 +153,11 @@
                 <span style="background: #ff007f; padding: 2px 6px; border-radius: 10px; font-size: 10px;">{{ pending_requests_count }}</span>
                 {% endif %}
             </a></p>
-            <p>💬 <a href="#">Messages</a></p>
+            <p>💬 <a href="{% url 'chat_list' %}" class="chat-link"><i class="fas fa-comments"></i> Messages
+                {% if unread_messages_count > 0 %}
+                <span class="message-badge">{{ unread_messages_count }}</span>
+                {% endif %}
+            </a></p>
             <p>🔔 <a href="#">Notifications</a></p>
             <p>⚙️ <a href="{% url 'settings' %}">Settings</a></p>
         </div>
@@ -546,6 +208,11 @@
                     💬 {{post.comments.count}}
                 </a>
 
+                <!-- Share Button that opens chat selection -->
+                <button class="share-btn" onclick="openShareOptions('{{ post.id }}', '{{ post.user }}', '{{ post.image.url }}', '{{ post.caption|escapejs }}')">
+                    🔄 Share
+                </button>
+
                 <form method="POST" action="{% url 'save_post' post.id %}" style="display: inline; margin: 0;">
                     {% csrf_token %}
                     <button type="submit" class="save-btn">
@@ -556,10 +223,6 @@
                         {% endif %}
                     </button>
                 </form>
-
-                <a href="#" class="share-btn">
-                    🔄 Share
-                </a>
             </div>
 
             <!-- Comment Box -->
@@ -598,7 +261,7 @@
     <!-- RIGHT SIDEBAR -->
     <div class="sidebar">
 
-        <!-- Suggestions -->
+        <!-- Suggestions Card -->
         <div class="card">
             <h4>👥 Suggested for you</h4>
             
@@ -622,6 +285,47 @@
                 <p style="text-align: center; font-size: 12px;">No suggestions available</p>
             {% endif %}
         </div>
+
+        <!-- ========== TIME TRACKING REPORT CARD (BELOW SUGGESTIONS) ========== -->
+        {% if user_profile.is_minor %}
+        <div class="card time-tracker-card" id="timeTrackerCard">
+            <h4><i class="fas fa-hourglass-half"></i> Daily Time Report</h4>
+            
+            <div class="time-stats">
+                <div class="time-stat-item">
+                    <div class="time-stat-value" id="usedTime">Loading...</div>
+                    <div class="time-stat-label">Used Today</div>
+                </div>
+                <div class="time-stat-item">
+                    <div class="time-stat-value" id="remainingTime">Loading...</div>
+                    <div class="time-stat-label">Remaining</div>
+                </div>
+                <div class="time-stat-item">
+                    <div class="time-stat-value" id="limitTime">4h</div>
+                    <div class="time-stat-label">Daily Limit</div>
+                </div>
+            </div>
+            
+            <div class="progress-bar-container">
+                <div class="progress-bar-bg">
+                    <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+            </div>
+            
+            <div id="timeWarning" class="time-warning normal">
+                <i class="fas fa-info-circle"></i> Loading time data...
+            </div>
+        </div>
+        {% else %}
+        <div class="card time-tracker-card">
+            <h4><i class="fas fa-hourglass-half"></i> Time Report</h4>
+            <div class="no-limit-badge">
+                <i class="fas fa-check-circle"></i>
+                <p>No time restrictions</p>
+                <small>You are over 20 years old</small>
+            </div>
+        </div>
+        {% endif %}
 
         <!-- Activity Card -->
         <div class="card activity-card">
@@ -662,7 +366,89 @@
 
 </div>
 
-<!-- JavaScript for Interactive Elements -->
+<!-- Share Options Modal -->
+<div id="shareModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-share-alt"></i> Share Post</h3>
+            <span class="close" onclick="closeShareModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 10px; color: #aaa;">Share to:</label>
+                <div style="display: flex; gap: 15px;">
+                    <label style="cursor: pointer;">
+                        <input type="radio" name="share_type" value="feed" checked> 
+                        <i class="fas fa-users"></i> My Feed
+                    </label>
+                    <label style="cursor: pointer;">
+                        <input type="radio" name="share_type" value="chat"> 
+                        <i class="fas fa-comment"></i> Chat
+                    </label>
+                </div>
+            </div>
+            
+            <div id="chatSelectDiv" style="display: none; margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; color: #aaa;">Select Friend:</label>
+                <select id="chatUserSelect" style="width: 100%; padding: 10px; border-radius: 8px; background: #1a1a1a; color: white; border: 1px solid #333;">
+                    <option value="">Loading chats...</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; color: #aaa;">Caption (optional):</label>
+                <textarea id="shareCaption" rows="3" placeholder="Write something..." style="width: 100%; padding: 10px; border-radius: 8px; background: #1a1a1a; color: white; border: 1px solid #333;"></textarea>
+            </div>
+            
+            <button onclick="submitShare()" class="share-submit-btn" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #ff007f, #ff4d4d); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer;">
+                <i class="fas fa-share-alt"></i> Share
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    .modal-content {
+        background: #0a0a0a;
+        border-radius: 15px;
+        max-width: 500px;
+        width: 90%;
+        border: 1px solid #333;
+    }
+    .modal-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #333;
+        display: flex;
+        justify-content: space-between;
+    }
+    .modal-body {
+        padding: 20px;
+    }
+    .close {
+        cursor: pointer;
+        font-size: 24px;
+        color: #aaa;
+    }
+    .close:hover {
+        color: #ff007f;
+    }
+    .share-submit-btn:hover {
+        transform: scale(1.02);
+    }
+</style>
+
 <script>
     // Get CSRF token
     function getCookie(name) {
@@ -681,6 +467,115 @@
     }
     
     const csrftoken = getCookie('csrftoken');
+    let currentSharePostId = null;
+    let currentSharePostImage = null;
+    let currentSharePostCaption = null;
+    
+    // Share modal functions
+    function openShareOptions(postId, postUser, postImage, postCaption) {
+        currentSharePostId = postId;
+        currentSharePostImage = postImage;
+        currentSharePostCaption = postCaption;
+        document.getElementById('shareModal').style.display = 'flex';
+        document.getElementById('shareCaption').value = '';
+        
+        // Reset radio
+        document.querySelector('input[name="share_type"][value="feed"]').checked = true;
+        document.getElementById('chatSelectDiv').style.display = 'none';
+        
+        // Load chats for share in chat
+        loadUserChatsForShare();
+    }
+    
+    function closeShareModal() {
+        document.getElementById('shareModal').style.display = 'none';
+    }
+    
+    // Listen for radio change
+    document.querySelectorAll('input[name="share_type"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'chat') {
+                document.getElementById('chatSelectDiv').style.display = 'block';
+            } else {
+                document.getElementById('chatSelectDiv').style.display = 'none';
+            }
+        });
+    });
+    
+    function loadUserChatsForShare() {
+        fetch('/get-user-chats/')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('chatUserSelect');
+                if (data.chats && data.chats.length > 0) {
+                    select.innerHTML = '<option value="">Select a friend...</option>';
+                    data.chats.forEach(chat => {
+                        select.innerHTML += `<option value="${chat.username}">@${chat.username}</option>`;
+                    });
+                } else {
+                    select.innerHTML = '<option value="">No chats available</option>';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    
+    function submitShare() {
+        const shareType = document.querySelector('input[name="share_type"]:checked').value;
+        const caption = document.getElementById('shareCaption').value;
+        
+        if (shareType === 'chat') {
+            const username = document.getElementById('chatUserSelect').value;
+            if (!username) {
+                showToast('Please select a friend', 'error');
+                return;
+            }
+            
+            fetch('/share-post-to-chat/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    post_id: currentSharePostId,
+                    username: username,
+                    caption: caption
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Post shared in chat!', 'success');
+                    closeShareModal();
+                } else {
+                    showToast(data.error || 'Error sharing post', 'error');
+                }
+            });
+        } else {
+            // Share to feed
+            fetch('/share-to-feed/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    post_id: currentSharePostId,
+                    caption: caption
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Post shared to your feed!', 'success');
+                    closeShareModal();
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast(data.error || 'Error sharing post', 'error');
+                }
+            });
+        }
+    }
     
     // Toggle notification dropdown
     function toggleNotifications() {
@@ -692,11 +587,13 @@
     document.addEventListener('click', function(event) {
         const notificationIcon = document.querySelector('.notification-icon');
         const dropdown = document.getElementById('notificationDropdown');
+        const modal = document.getElementById('shareModal');
         
         if (notificationIcon && !notificationIcon.contains(event.target)) {
-            if (dropdown) {
-                dropdown.classList.remove('show');
-            }
+            if (dropdown) dropdown.classList.remove('show');
+        }
+        if (modal && event.target == modal) {
+            closeShareModal();
         }
     });
     
@@ -717,44 +614,18 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Remove the notification item
                 const notifItem = document.getElementById(`notif-${requestId}`);
-                if (notifItem) {
-                    notifItem.remove();
-                    
-                    // Update badge count
-                    const badge = document.querySelector('.notification-badge');
-                    const currentCount = parseInt(badge?.textContent || 0);
-                    
-                    if (currentCount > 1) {
-                        if (badge) badge.textContent = currentCount - 1;
-                    } else {
-                        if (badge) badge.style.display = 'none';
-                    }
-                    
-                    // Check if no more notifications
-                    const remainingNotifs = document.querySelectorAll('.notification-item').length;
-                    if (remainingNotifs === 0) {
-                        const notificationList = document.getElementById('notificationList');
-                        if (notificationList) {
-                            notificationList.innerHTML = `
-                                <div class="empty-notifications">
-                                    <i class="fas fa-inbox"></i>
-                                    <p>No follow requests</p>
-                                </div>
-                            `;
-                        }
-                    }
+                if (notifItem) notifItem.remove();
+                const badge = document.querySelector('.notification-badge');
+                if (badge) {
+                    const currentCount = parseInt(badge.textContent || 0);
+                    if (currentCount > 1) badge.textContent = currentCount - 1;
+                    else badge.style.display = 'none';
                 }
-                
                 showToast(`Request ${action === 'approve' ? 'approved' : 'rejected'}!`, 'success');
             } else {
                 showToast(data.message || 'Something went wrong', 'error');
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('Network error. Please try again.', 'error');
         });
     }
     
@@ -764,75 +635,69 @@
         if (!toast) {
             toast = document.createElement('div');
             toast.id = 'toastMessage';
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                padding: 12px 20px;
-                border-radius: 8px;
-                color: white;
-                z-index: 9999;
-                animation: slideIn 0.3s ease;
-            `;
+            toast.style.cssText = `position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; z-index: 9999; animation: slideIn 0.3s ease;`;
             document.body.appendChild(toast);
         }
-        
         toast.textContent = message;
         toast.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
         toast.style.display = 'block';
-        
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 3000);
+        setTimeout(() => toast.style.display = 'none', 3000);
     }
     
-    // Auto-hide flash messages after 3 seconds
+    // Time tracking functions
+    function updateTimeDisplay() {
+        fetch('/api/remaining-time/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.has_limit) {
+                    const usedElement = document.getElementById('usedTime');
+                    if (usedElement) usedElement.innerHTML = data.used_hours > 0 ? `${data.used_hours}h ${data.used_mins}m` : `${data.used_mins}m`;
+                    const remainingElement = document.getElementById('remainingTime');
+                    if (remainingElement) remainingElement.innerHTML = data.remaining_hours > 0 ? `${data.remaining_hours}h ${data.remaining_mins}m` : `${data.remaining_mins}m`;
+                    const progressFill = document.getElementById('progressFill');
+                    if (progressFill) progressFill.style.width = `${data.percent_used}%`;
+                    const warningDiv = document.getElementById('timeWarning');
+                    if (warningDiv) {
+                        if (data.remaining_minutes <= 0) {
+                            warningDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Daily limit reached! Come back tomorrow.';
+                            warningDiv.className = 'time-warning exhausted';
+                        } else if (data.remaining_minutes < 30) {
+                            warningDiv.innerHTML = '<i class="fas fa-hourglass-end"></i> Less than 30 minutes remaining!';
+                            warningDiv.className = 'time-warning low';
+                        }
+                    }
+                }
+            });
+    }
+    
+    {% if user_profile.is_minor %}
+    updateTimeDisplay();
+    setInterval(updateTimeDisplay, 60000);
+    {% endif %}
+    
+    // Other existing functions
     setTimeout(function() {
-        var messages = document.querySelectorAll('.message');
-        messages.forEach(function(msg) {
-            msg.style.display = 'none';
-        });
+        document.querySelectorAll('.message').forEach(msg => msg.style.display = 'none');
     }, 3000);
     
-    // Image preview before upload
     document.querySelector('input[type="file"]')?.addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
-            var fileName = e.target.files[0].name;
-            var preview = document.createElement('span');
-            preview.style.fontSize = '12px';
-            preview.style.color = '#ff007f';
-            preview.textContent = ' ✓ ' + fileName;
+            let preview = document.createElement('span');
+            preview.style.cssText = 'font-size:12px;color:#ff007f;margin-left:10px;';
+            preview.textContent = ' ✓ ' + e.target.files[0].name;
             e.target.parentNode.appendChild(preview);
             setTimeout(() => preview.remove(), 2000);
         }
     });
     
-    // Smooth scroll to top when clicking logo
-    document.querySelector('.logo')?.addEventListener('click', function() {
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    });
+    document.querySelector('.logo')?.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
     
-    // Confirm before logout
     document.querySelector('.logout')?.addEventListener('click', function(e) {
-        if (!confirm('Are you sure you want to logout?')) {
-            e.preventDefault();
-        }
+        if (!confirm('Are you sure you want to logout?')) e.preventDefault();
     });
     
-    // Add CSS animation
     const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-    `;
+    style.textContent = `@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }`;
     document.head.appendChild(style);
 </script>
 
