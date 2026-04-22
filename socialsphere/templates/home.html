@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
-    /* Additional styles for chat link */
+    /* Additional styles */
     .chat-link {
         color: #ff007f;
         text-decoration: none;
@@ -24,7 +24,6 @@
         color: #ff4d4d;
     }
     
-    /* Messages badge */
     .message-badge {
         background: #ff007f;
         color: white;
@@ -33,6 +32,244 @@
         font-size: 10px;
         min-width: 18px;
         text-align: center;
+    }
+
+    /* Comments section */
+    .comments-section {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #1c1c1c;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    
+    .comment-item {
+        font-size: 12px;
+        margin-bottom: 8px;
+        padding: 5px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.03);
+    }
+    
+    .comment-item strong {
+        color: #ff007f;
+    }
+    
+    .comment-time {
+        font-size: 9px;
+        color: #666;
+        margin-left: 8px;
+    }
+    
+    .view-all-link {
+        display: block;
+        text-align: center;
+        font-size: 11px;
+        color: #ff007f;
+        text-decoration: none;
+        margin-top: 8px;
+        padding: 5px;
+    }
+    
+    .view-all-link:hover {
+        text-decoration: underline;
+    }
+    
+    /* Share Modal - Instagram Style */
+    .share-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    
+    .share-modal-content {
+        background: #0a0a0a;
+        border-radius: 20px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid #333;
+    }
+    
+    .share-modal-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #333;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .share-modal-header h3 {
+        font-size: 18px;
+        color: #ff007f;
+    }
+    
+    .share-modal-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px 0;
+    }
+    
+    .friend-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: background 0.2s;
+        border-bottom: 1px solid #1a1a1a;
+    }
+    
+    .friend-item:hover {
+        background: #1a1a1a;
+    }
+    
+    .friend-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .friend-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ff007f;
+    }
+    
+    .friend-name {
+        font-weight: 600;
+    }
+    
+    .friend-username {
+        font-size: 12px;
+        color: #888;
+    }
+    
+    .send-btn-chat {
+        background: linear-gradient(45deg, #ff007f, #ff4d4d);
+        border: none;
+        padding: 6px 16px;
+        border-radius: 20px;
+        color: white;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .send-btn-chat:hover {
+        transform: scale(1.02);
+    }
+    
+    .share-caption-input {
+        padding: 15px 20px;
+        border-top: 1px solid #333;
+        border-bottom: 1px solid #333;
+    }
+    
+    .share-caption-input textarea {
+        width: 100%;
+        padding: 12px;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        color: white;
+        font-size: 14px;
+        resize: none;
+        font-family: inherit;
+    }
+    
+    .share-caption-input textarea:focus {
+        outline: none;
+        border-color: #ff007f;
+    }
+    
+    .friend-search {
+        padding: 12px 20px;
+        border-bottom: 1px solid #333;
+    }
+    
+    .friend-search input {
+        width: 100%;
+        padding: 10px 15px;
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 25px;
+        color: white;
+        font-size: 14px;
+    }
+    
+    .friend-search input:focus {
+        outline: none;
+        border-color: #ff007f;
+    }
+    
+    .close-modal {
+        cursor: pointer;
+        font-size: 24px;
+        color: #aaa;
+    }
+    
+    .close-modal:hover {
+        color: #ff007f;
+    }
+    
+    .no-friends {
+        text-align: center;
+        padding: 40px;
+        color: #888;
+    }
+    
+    .post-preview {
+        padding: 15px 20px;
+        background: #1a1a1a;
+        margin: 0;
+        display: flex;
+        gap: 12px;
+        border-bottom: 1px solid #333;
+    }
+    
+    .post-preview img {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+    
+    .post-preview p {
+        font-size: 12px;
+        color: #aaa;
+        margin-top: 4px;
+    }
+    
+    .post-preview strong {
+        color: white;
+        font-size: 13px;
+    }
+    
+    .retry-btn {
+        margin-top: 15px;
+        background: #ff007f;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 20px;
+        color: white;
+        cursor: pointer;
+    }
+    
+    .retry-btn:hover {
+        background: #ff4d4d;
     }
 </style>
 </head>
@@ -53,14 +290,12 @@
     </form>
 
     <div class="nav-right">
-        <!-- Notification Bell with Dropdown -->
         <div class="notification-icon" onclick="toggleNotifications()">
             <i class="fa fa-bell"></i>
             {% if pending_requests_count > 0 %}
             <span class="notification-badge">{{ pending_requests_count }}</span>
             {% endif %}
             
-            <!-- Notification Dropdown -->
             <div class="notification-dropdown" id="notificationDropdown">
                 <div class="notification-header">
                     <i class="fas fa-user-plus"></i> Follow Requests
@@ -78,12 +313,8 @@
                                 </div>
                             </div>
                             <div class="notification-actions">
-                                <button class="notif-approve-btn" onclick="handleRequestFromNotif({{ request.id }}, 'approve')">
-                                    ✓
-                                </button>
-                                <button class="notif-reject-btn" onclick="handleRequestFromNotif({{ request.id }}, 'reject')">
-                                    ✗
-                                </button>
+                                <button class="notif-approve-btn" onclick="handleRequestFromNotif({{ request.id }}, 'approve')">✓</button>
+                                <button class="notif-reject-btn" onclick="handleRequestFromNotif({{ request.id }}, 'reject')">✗</button>
                             </div>
                         </div>
                         {% endfor %}
@@ -97,7 +328,6 @@
             </div>
         </div>
         
-        <!-- Messages Link with Badge -->
         <a href="{% url 'chat_list' %}" style="color: white; position: relative;">
             <i class="fa fa-comment"></i>
             {% if unread_messages_count > 0 %}
@@ -120,14 +350,12 @@
     <!-- LEFT SIDEBAR -->
     <div class="sidebar">
 
-        <!-- Profile Card -->
         <div class="card profile-card">
             <img src="{{user_profile.profileimage.url}}" class="profile-img" alt="Profile">
             <h3>{{user.username}}</h3>
             <p>@{{user.username}}</p>
             <p style="font-size: 12px; color: gray;">{{user_profile.bio|truncatewords:15}}</p>
             
-            <!-- Privacy Badge -->
             <div style="margin: 5px 0;">
                 {% if user_profile.is_private %}
                     <span class="privacy-badge privacy-private"><i class="fas fa-lock"></i> Private Account</span>
@@ -145,7 +373,6 @@
             <a href="{% url 'profile' user.username %}" class="btn">👤 My Profile</a>
         </div>
 
-        <!-- Quick Links -->
         <div class="card links">
             <p>📌 <a href="{% url 'saved_posts' %}">Saved Posts</a></p>
             <p>👥 <a href="{% url 'pending_requests' %}">Follow Requests 
@@ -158,7 +385,6 @@
                 <span class="message-badge">{{ unread_messages_count }}</span>
                 {% endif %}
             </a></p>
-            <p>🔔 <a href="#">Notifications</a></p>
             <p>⚙️ <a href="{% url 'settings' %}">Settings</a></p>
         </div>
 
@@ -167,16 +393,13 @@
     <!-- CENTER FEED -->
     <div class="feed">
 
-        <!-- Create Post -->
         <div class="card create-post">
             <form action="{% url 'upload' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
-
                 <div class="create-top">
                     <img src="{{user_profile.profileimage.url}}" alt="Avatar">
                     <input type="text" name="caption" placeholder="What's on your mind? ✨">
                 </div>
-
                 <div class="create-bottom">
                     <input type="file" name="image_upload" accept="image/*">
                     <button type="submit">📤 Post</button>
@@ -184,11 +407,8 @@
             </form>
         </div>
 
-        <!-- Posts Feed -->
         {% for post in posts reversed %}
         <div class="card post">
-
-            <!-- Post Header -->
             <div class="post-header">
                 <img src="{{user_profile.profileimage.url}}" alt="Avatar">
                 <div>
@@ -199,72 +419,63 @@
 
             <p class="caption">{{post.caption}}</p>
             <img src="{{post.image.url}}" class="post-img" alt="Post">
+            
             <div class="actions">
                 <a href="{% url 'like_post' %}?post_id={{post.id}}" class="like-btn">
                     ❤️ {{post.no_of_likes}}
                 </a>
-
                 <a href="{% url 'view_comments' post.id %}" class="comment-link">
                     💬 {{post.comments.count}}
                 </a>
-
-                <!-- Share Button that opens chat selection -->
-                <button class="share-btn" onclick="openShareOptions('{{ post.id }}', '{{ post.user }}', '{{ post.image.url }}', '{{ post.caption|escapejs }}')">
-                    🔄 Share
+                <button class="share-btn" onclick="openShareModal('{{ post.id }}', '{{ post.user }}', '{{ post.image.url }}', '{{ post.caption|escapejs }}')">
+                    <i class="fas fa-paper-plane"></i> Share
                 </button>
-
                 <form method="POST" action="{% url 'save_post' post.id %}" style="display: inline; margin: 0;">
                     {% csrf_token %}
                     <button type="submit" class="save-btn">
-                        {% if post.id in saved_post_ids %}
-                            🔖 Saved
-                        {% else %}
-                            📌 Save
-                        {% endif %}
+                        {% if post.id in saved_post_ids %}🔖 Saved{% else %}📌 Save{% endif %}
                     </button>
                 </form>
             </div>
 
-            <!-- Comment Box -->
             <form method="POST" action="{% url 'add_comment' post.id %}" class="comment-box">
                 {% csrf_token %}
                 <input type="text" name="comment_text" placeholder="Write a comment... 💬">
                 <button type="submit">Post</button>
             </form>
 
-            {% with post.comments.all|slice:":2" as recent_comments %}
-                {% if recent_comments %}
-                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #1c1c1c;">
-                        {% for comment in recent_comments %}
-                            <div style="font-size: 12px; margin-bottom: 5px;">
-                                <strong>{{comment.user}}</strong> {{comment.text}}
-                            </div>
-                        {% endfor %}
-                        {% if post.comments.count > 2 %}
-                            <a href="{% url 'view_comments' post.id %}" style="color: #ff007f; font-size: 12px; text-decoration: none;">
-                                View all {{post.comments.count}} comments →
-                            </a>
-                        {% endif %}
+            <div class="comments-section">
+                {% if post.comments.all %}
+                    {% for comment in post.comments.all|slice:":3" %}
+                        <div class="comment-item">
+                            <strong>{{ comment.user }}</strong> 
+                            <span>{{ comment.text|truncatechars:60 }}</span>
+                            <span class="comment-time">{{ comment.created_at|timesince }} ago</span>
+                        </div>
+                    {% endfor %}
+                    {% if post.comments.count > 3 %}
+                        <a href="{% url 'view_comments' post.id %}" class="view-all-link">
+                            View all {{ post.comments.count }} comments →
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <div style="font-size: 11px; color: #666; text-align: center; padding: 5px;">
+                        No comments yet. Be the first to comment!
                     </div>
                 {% endif %}
-            {% endwith %}
-
+            </div>
         </div>
         {% empty %}
         <div class="card" style="text-align: center;">
             <p>No posts yet! Follow users to see their posts.</p>
         </div>
         {% endfor %}
-
     </div>
 
     <!-- RIGHT SIDEBAR -->
     <div class="sidebar">
-
-        <!-- Suggestions Card -->
         <div class="card">
             <h4>👥 Suggested for you</h4>
-            
             {% if suggestions_username_profile_list %}
                 {% for suggestion in suggestions_username_profile_list %}
                 <div class="suggestion">
@@ -286,11 +497,9 @@
             {% endif %}
         </div>
 
-        <!-- ========== TIME TRACKING REPORT CARD (BELOW SUGGESTIONS) ========== -->
         {% if user_profile.is_minor %}
         <div class="card time-tracker-card" id="timeTrackerCard">
             <h4><i class="fas fa-hourglass-half"></i> Daily Time Report</h4>
-            
             <div class="time-stats">
                 <div class="time-stat-item">
                     <div class="time-stat-value" id="usedTime">Loading...</div>
@@ -305,13 +514,11 @@
                     <div class="time-stat-label">Daily Limit</div>
                 </div>
             </div>
-            
             <div class="progress-bar-container">
                 <div class="progress-bar-bg">
                     <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
                 </div>
             </div>
-            
             <div id="timeWarning" class="time-warning normal">
                 <i class="fas fa-info-circle"></i> Loading time data...
             </div>
@@ -327,130 +534,65 @@
         </div>
         {% endif %}
 
-        <!-- Activity Card -->
         <div class="card activity-card">
             <h4>⏱️ Your Activity</h4>
-            
             <div class="activity-item">
                 <span class="activity-label">📅 Today</span>
                 <span class="activity-value">
-                    {% if today_hours > 0 %}
-                        {{ today_hours }}h {{ today_minutes }}m
-                    {% else %}
-                        {{ today_minutes }} min
-                    {% endif %}
+                    {% if today_hours > 0 %}{{ today_hours }}h {{ today_minutes }}m{% else %}{{ today_minutes }} min{% endif %}
                 </span>
             </div>
-            
             <div class="activity-divider"></div>
-            
             <div class="activity-item">
                 <span class="activity-label">📊 Total</span>
                 <span class="activity-value">
-                    {% if total_hours > 0 %}
-                        {{ total_hours }}h {{ total_minutes }}m
-                    {% else %}
-                        {{ total_minutes }} min
-                    {% endif %}
+                    {% if total_hours > 0 %}{{ total_hours }}h {{ total_minutes }}m{% else %}{{ total_minutes }} min{% endif %}
                 </span>
             </div>
         </div>
 
-        <!-- Footer Info -->
         <div class="card" style="text-align: center; font-size: 10px;">
             <p>© 2024 SocialSphere</p>
             <p>Connect • Share • Inspire</p>
         </div>
-
-    </div>
-
-</div>
-
-<!-- Share Options Modal -->
-<div id="shareModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3><i class="fas fa-share-alt"></i> Share Post</h3>
-            <span class="close" onclick="closeShareModal()">&times;</span>
-        </div>
-        <div class="modal-body">
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 10px; color: #aaa;">Share to:</label>
-                <div style="display: flex; gap: 15px;">
-                    <label style="cursor: pointer;">
-                        <input type="radio" name="share_type" value="feed" checked> 
-                        <i class="fas fa-users"></i> My Feed
-                    </label>
-                    <label style="cursor: pointer;">
-                        <input type="radio" name="share_type" value="chat"> 
-                        <i class="fas fa-comment"></i> Chat
-                    </label>
-                </div>
-            </div>
-            
-            <div id="chatSelectDiv" style="display: none; margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 5px; color: #aaa;">Select Friend:</label>
-                <select id="chatUserSelect" style="width: 100%; padding: 10px; border-radius: 8px; background: #1a1a1a; color: white; border: 1px solid #333;">
-                    <option value="">Loading chats...</option>
-                </select>
-            </div>
-            
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 5px; color: #aaa;">Caption (optional):</label>
-                <textarea id="shareCaption" rows="3" placeholder="Write something..." style="width: 100%; padding: 10px; border-radius: 8px; background: #1a1a1a; color: white; border: 1px solid #333;"></textarea>
-            </div>
-            
-            <button onclick="submitShare()" class="share-submit-btn" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #ff007f, #ff4d4d); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer;">
-                <i class="fas fa-share-alt"></i> Share
-            </button>
-        </div>
     </div>
 </div>
 
-<style>
-    .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
-    .modal-content {
-        background: #0a0a0a;
-        border-radius: 15px;
-        max-width: 500px;
-        width: 90%;
-        border: 1px solid #333;
-    }
-    .modal-header {
-        padding: 15px 20px;
-        border-bottom: 1px solid #333;
-        display: flex;
-        justify-content: space-between;
-    }
-    .modal-body {
-        padding: 20px;
-    }
-    .close {
-        cursor: pointer;
-        font-size: 24px;
-        color: #aaa;
-    }
-    .close:hover {
-        color: #ff007f;
-    }
-    .share-submit-btn:hover {
-        transform: scale(1.02);
-    }
-</style>
+<!-- Share Modal -->
+<div id="shareModal" class="share-modal" style="display: none;">
+    <div class="share-modal-content">
+        <div class="share-modal-header">
+            <h3><i class="fas fa-paper-plane"></i> Share to Chat</h3>
+            <span class="close-modal" onclick="closeShareModal()">&times;</span>
+        </div>
+        
+        <div class="post-preview">
+            <img id="sharePostImage" src="" alt="Post">
+            <div>
+                <strong id="sharePostUser"></strong>
+                <p id="sharePostCaption"></p>
+            </div>
+        </div>
+        
+        <div class="share-caption-input">
+            <textarea id="shareCaption" rows="2" placeholder="Add a message... (optional)"></textarea>
+        </div>
+        
+        <div class="friend-search">
+            <input type="text" id="friendSearch" placeholder="Search friends..." onkeyup="filterFriends()">
+        </div>
+        
+        <div class="share-modal-body" id="friendsList">
+            <div style="text-align: center; padding: 20px;">
+                <i class="fas fa-spinner fa-spin"></i> Loading friends...
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
-    // Get CSRF token
+    // ==================== HELPER FUNCTIONS ====================
+    
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -467,123 +609,163 @@
     }
     
     const csrftoken = getCookie('csrftoken');
+    
+    // ==================== SHARE MODAL VARIABLES ====================
+    
     let currentSharePostId = null;
     let currentSharePostImage = null;
     let currentSharePostCaption = null;
+    let currentSharePostUser = null;
     
-    // Share modal functions
-    function openShareOptions(postId, postUser, postImage, postCaption) {
+    // ==================== SHARE MODAL FUNCTIONS ====================
+    
+    function openShareModal(postId, postUser, postImage, postCaption) {
         currentSharePostId = postId;
         currentSharePostImage = postImage;
         currentSharePostCaption = postCaption;
-        document.getElementById('shareModal').style.display = 'flex';
+        currentSharePostUser = postUser;
+        
+        document.getElementById('sharePostImage').src = postImage;
+        document.getElementById('sharePostUser').innerHTML = '@' + postUser;
+        let shortCaption = postCaption.length > 80 ? postCaption.substring(0, 80) + '...' : postCaption;
+        document.getElementById('sharePostCaption').innerHTML = shortCaption;
+        
         document.getElementById('shareCaption').value = '';
+        document.getElementById('friendSearch').value = '';
+        document.getElementById('shareModal').style.display = 'flex';
         
-        // Reset radio
-        document.querySelector('input[name="share_type"][value="feed"]').checked = true;
-        document.getElementById('chatSelectDiv').style.display = 'none';
-        
-        // Load chats for share in chat
-        loadUserChatsForShare();
+        loadFriendsList();
     }
     
     function closeShareModal() {
         document.getElementById('shareModal').style.display = 'none';
     }
     
-    // Listen for radio change
-    document.querySelectorAll('input[name="share_type"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.value === 'chat') {
-                document.getElementById('chatSelectDiv').style.display = 'block';
-            } else {
-                document.getElementById('chatSelectDiv').style.display = 'none';
-            }
-        });
-    });
+    // ==================== LOAD FRIENDS FROM FOLLOWERS/FOLLOWING ====================
     
-    function loadUserChatsForShare() {
-        fetch('/get-user-chats/')
-            .then(response => response.json())
+    function loadFriendsList() {
+        const container = document.getElementById('friendsList');
+        container.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading friends...</div>';
+        
+        fetch('/get-friends-list/')
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
             .then(data => {
-                const select = document.getElementById('chatUserSelect');
-                if (data.chats && data.chats.length > 0) {
-                    select.innerHTML = '<option value="">Select a friend...</option>';
-                    data.chats.forEach(chat => {
-                        select.innerHTML += `<option value="${chat.username}">@${chat.username}</option>`;
+                if (data.friends && data.friends.length > 0) {
+                    container.innerHTML = '';
+                    data.friends.forEach(friend => {
+                        container.innerHTML += `
+                            <div class="friend-item" data-username="${friend.username}">
+                                <div class="friend-info">
+                                    <img src="${friend.avatar}" class="friend-avatar" onerror="this.src='/static/images/blankprofile.jpg'">
+                                    <div>
+                                        <div class="friend-name">${friend.name || friend.username}</div>
+                                        <div class="friend-username">@${friend.username}</div>
+                                    </div>
+                                </div>
+                                <button class="send-btn-chat" onclick="shareToChat('${friend.username}')">
+                                    <i class="fas fa-paper-plane"></i> Send
+                                </button>
+                            </div>
+                        `;
                     });
                 } else {
-                    select.innerHTML = '<option value="">No chats available</option>';
+                    container.innerHTML = `
+                        <div class="no-friends">
+                            <i class="fas fa-users" style="font-size: 48px; margin-bottom: 15px;"></i>
+                            <p>No friends to share with</p>
+                            <small>Follow people to share posts with them</small>
+                        </div>
+                    `;
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                container.innerHTML = `
+                    <div class="no-friends">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <p>Could not load friends</p>
+                        <small>Make sure you have followed some users</small>
+                        <button class="retry-btn" onclick="loadFriendsList()">
+                            <i class="fas fa-sync-alt"></i> Retry
+                        </button>
+                    </div>
+                `;
+            });
     }
     
-    function submitShare() {
-        const shareType = document.querySelector('input[name="share_type"]:checked').value;
+    // ==================== SEARCH FRIENDS ====================
+    
+    function filterFriends() {
+        const searchTerm = document.getElementById('friendSearch').value.toLowerCase();
+        const friends = document.querySelectorAll('.friend-item');
+        friends.forEach(friend => {
+            const username = friend.getAttribute('data-username').toLowerCase();
+            if (username.includes(searchTerm)) {
+                friend.style.display = 'flex';
+            } else {
+                friend.style.display = 'none';
+            }
+        });
+    }
+    
+    // ==================== SHARE POST TO CHAT ====================
+    
+    function shareToChat(username) {
         const caption = document.getElementById('shareCaption').value;
         
-        if (shareType === 'chat') {
-            const username = document.getElementById('chatUserSelect').value;
-            if (!username) {
-                showToast('Please select a friend', 'error');
-                return;
+        fetch('/share-post-to-chat/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                post_id: currentSharePostId,
+                username: username,
+                caption: caption
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Post shared to @' + username + '!', 'success');
+                closeShareModal();
+            } else {
+                showToast(data.error || 'Error sharing post', 'error');
             }
-            
-            fetch('/share-post-to-chat/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrftoken,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    post_id: currentSharePostId,
-                    username: username,
-                    caption: caption
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showToast('Post shared in chat!', 'success');
-                    closeShareModal();
-                } else {
-                    showToast(data.error || 'Error sharing post', 'error');
-                }
-            });
-        } else {
-            // Share to feed
-            fetch('/share-to-feed/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrftoken,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    post_id: currentSharePostId,
-                    caption: caption
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showToast('Post shared to your feed!', 'success');
-                    closeShareModal();
-                    setTimeout(() => location.reload(), 1000);
-                } else {
-                    showToast(data.error || 'Error sharing post', 'error');
-                }
-            });
-        }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Network error. Please try again.', 'error');
+        });
     }
     
-    // Toggle notification dropdown
+    // ==================== TOAST NOTIFICATION ====================
+    
+    function showToast(message, type) {
+        let toast = document.getElementById('toastMessage');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toastMessage';
+            toast.style.cssText = `position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; z-index: 9999; animation: slideIn 0.3s ease;`;
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 3000);
+    }
+    
+    // ==================== NOTIFICATION DROPDOWN ====================
+    
     function toggleNotifications() {
         const dropdown = document.getElementById('notificationDropdown');
         dropdown.classList.toggle('show');
     }
     
-    // Close dropdown when clicking outside
     document.addEventListener('click', function(event) {
         const notificationIcon = document.querySelector('.notification-icon');
         const dropdown = document.getElementById('notificationDropdown');
@@ -592,16 +774,13 @@
         if (notificationIcon && !notificationIcon.contains(event.target)) {
             if (dropdown) dropdown.classList.remove('show');
         }
-        if (modal && event.target == modal) {
+        if (modal && event.target === modal) {
             closeShareModal();
         }
     });
     
-    // Handle request from notification
     function handleRequestFromNotif(requestId, action) {
-        const url = action === 'approve' 
-            ? `/approve-request/${requestId}/` 
-            : `/reject-request/${requestId}/`;
+        const url = action === 'approve' ? `/approve-request/${requestId}/` : `/reject-request/${requestId}/`;
         
         fetch(url, {
             method: 'POST',
@@ -629,22 +808,8 @@
         });
     }
     
-    // Show toast message
-    function showToast(message, type) {
-        let toast = document.getElementById('toastMessage');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'toastMessage';
-            toast.style.cssText = `position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; z-index: 9999; animation: slideIn 0.3s ease;`;
-            document.body.appendChild(toast);
-        }
-        toast.textContent = message;
-        toast.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
-        toast.style.display = 'block';
-        setTimeout(() => toast.style.display = 'none', 3000);
-    }
+    // ==================== TIME TRACKING ====================
     
-    // Time tracking functions
     function updateTimeDisplay() {
         fetch('/api/remaining-time/')
             .then(response => response.json())
@@ -675,10 +840,7 @@
     setInterval(updateTimeDisplay, 60000);
     {% endif %}
     
-    // Other existing functions
-    setTimeout(function() {
-        document.querySelectorAll('.message').forEach(msg => msg.style.display = 'none');
-    }, 3000);
+    // ==================== OTHER FUNCTIONS ====================
     
     document.querySelector('input[type="file"]')?.addEventListener('change', function(e) {
         if (e.target.files.length > 0) {

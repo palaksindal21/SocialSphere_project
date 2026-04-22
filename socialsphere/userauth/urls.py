@@ -39,4 +39,8 @@ urlpatterns = [
     path('get-or-create-chat/', views.get_or_create_chat, name='get_or_create_chat'),
     path('get-user-chats/', views.get_user_chats, name='get_user_chats'),
     path('get-people-to-connect/', views.get_people_to_connect, name='get_people_to_connect'),
+    path('share-post-to-chat/', views.share_post_to_chat, name='share_post_to_chat'),
+    path('get-friends-list/', views.get_friends_list, name='get_friends_list'),
+    path('view-post/<str:post_id>/', views.view_post, name='view_post'),
+    
 ]

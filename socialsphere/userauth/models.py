@@ -358,6 +358,7 @@ class ChatMessage(models.Model):
     shared_post_id = models.CharField(max_length=500, blank=True, null=True)
     shared_post_image = models.CharField(max_length=500, blank=True, null=True)
     shared_post_caption = models.TextField(blank=True, null=True)
+    shared_post_username = models.CharField(max_length=150, blank=True, null=True)
     is_read = models.BooleanField(default=False)
     is_delivered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

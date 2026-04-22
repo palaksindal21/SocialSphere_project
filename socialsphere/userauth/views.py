@@ -16,6 +16,8 @@ from .follow_utils import (follow_user, unfollow_user, send_follow_request,
                            approve_follow_request, reject_follow_request,
                         cancel_follow_request, get_pending_requests,
                         check_follow_status,get_follow_relationship_status)
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 # Create your views here.
 
 #Landig Page 
@@ -1053,3 +1055,121 @@ def get_people_to_connect(request):
     print(f"Returning {len(users_data)} users")
     
     return JsonResponse({'users': users_data})
+
+
+
+@login_required
+@csrf_exempt
+def share_post_to_chat(request):
+    if request.method != 'POST':
+        return JsonResponse({'error':'Method are not allowed!'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        post_id = data.get('post_id')
+        username = data.get('username')
+        caption = data.get('caption','')
+
+        # Get the post
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found'}, status=404)
+        
+         # Get the user to share with
+        try:
+            other_user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        
+        # Create or get chat room
+        usernames = sorted([request.user.username, username])
+        room_name = f"{usernames[0]}_{usernames[1]}"
+
+        room, created = ChatRoom.objects.get_or_create(
+            room_name=room_name,
+            defaults={'room_type': 'direct'})
+        
+        if created:
+            room.participants.add(request.user, other_user)
+
+        # Create message with shared post
+        chat_message = ChatMessage.objects.create(
+            room=room,
+            sender=request.user.username,
+            message_type='post_share',
+            message=f"📷 Shared a post" + (f": {caption}" if caption else ""),
+            shared_post_id=str(post.id),
+            shared_post_image=post.image.url,
+            shared_post_caption=post.caption,
+            shared_post_username=post.user
+        )
+
+        # Update room last message
+        room.last_message = f"📷 {request.user.username} shared a post"
+        room.last_message_time = timezone.now()
+        room.last_message_sender = request.user.username
+        room.save()
+
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'chat_{room_name}',
+            {
+                'type': 'chat_message',
+                'message_id': str(chat_message.message_id),
+                'message': chat_message.message,
+                'sender': request.user.username,
+                'message_type': 'post_share',
+                'shared_post_id': str(post.id),
+                'shared_post_image': post.image.url,
+                'shared_post_caption': post.caption,
+                'shared_post_username': post.user,
+                'timestamp': timezone.now().isoformat()
+            }
+        )
+
+        return JsonResponse({
+            'success': True,
+            'message': 'Post shared in chat!',
+            'room_name': room_name
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def get_friends_list(request):
+    
+    user = request.user
+    followers = FollowersCount.objects.filter(user=user.username, is_accepted=True).values_list('follower', flat=True)
+    following = FollowersCount.objects.filter(follower=user.username, is_accepted=True).values_list('user', flat=True)
+    friends_usernames = set(list(followers) + list(following))
+    if user.username in friends_usernames:
+        friends_usernames.remove(user.username)
+    
+    friends = []
+    for username in friends_usernames:
+        try:
+            friend_user = User.objects.get(username=username)
+            profile = Profile.objects.get(user=friend_user)
+            friends.append({
+                'username': friend_user.username,
+                'name': friend_user.get_full_name() or friend_user.username,
+                'avatar': profile.profileimage.url if profile.profileimage else '/static/images/blankprofile.jpg',
+                'bio': profile.bio[:50] if profile.bio else ''
+            })
+        except:
+            pass
+    
+    return JsonResponse({'friends': friends})
+
+
+@login_required
+def view_post(request, post_id):
+    try:
+        post = Post.objects.get(id=post_id)
+        return render(request, 'view_post.html', {'post': post})
+    except Post.DoesNotExist:
+        messages.error(request, 'Post not found')
+        return redirect('home')

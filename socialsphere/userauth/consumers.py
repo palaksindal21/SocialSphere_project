@@ -141,3 +141,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 message.mark_as_read()
         except ChatMessage.DoesNotExist:
             pass
+
+
+    async def chat_message(self, event):
+        await self.send(text_data=json.dumps({
+        'type': 'chat',
+        'message': event.get('message', ''),
+        'sender': event['sender'],
+        'timestamp': event.get('timestamp'),
+        'message_id': event.get('message_id'),
+        'message_type': event.get('message_type', 'text'),
+        'shared_post_id': event.get('shared_post_id'),
+        'shared_post_image': event.get('shared_post_image'),
+        'shared_post_caption': event.get('shared_post_caption'),
+        'shared_post_username': event.get('shared_post_username')
+    }))
