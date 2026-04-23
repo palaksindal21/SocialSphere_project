@@ -374,3 +374,50 @@ class ChatMessage(models.Model):
         self.is_read = True
         self.save()
 
+
+class Notifications(models.Model):
+    NOTIFICATION_TYPES = [
+        ('like', 'Like'),
+        ('comment', 'Comment'),
+        ('follow', 'Follow'),
+        ('share', 'Share'),
+        ('message', 'Message'),
+        ('follow_request', 'Follow Request'),
+        ('follow_approved', 'Follow Approved'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    from_user = models.CharField(max_length=150, blank=True, null=True)
+    notification_type = models.CharField(max_length=50, choices=NOTIFICATION_TYPES)
+    message = models.TextField()
+    related_post_id = models.CharField(max_length=500, blank=True, null=True)
+    related_comment_id = models.CharField(max_length=500, blank=True, null=True)
+    related_request_id = models.IntegerField(blank=True, null=True)
+    related_message_id = models.UUIDField(blank=True, null=True)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        ordering = ['-created_at']  
+    
+    def __str__(self):
+        return f"{self.user.username}: {self.message[:50]}"
+    
+    @classmethod
+    def get_unread_count(cls, user):
+        return cls.objects.filter(user=user, is_read=False).count()
+    
+    def mark_as_read(self):
+        self.is_read = True
+        self.save()
+
+
+
+class SharedPost(models.Model):
+    original_post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='shares')
+    shared_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shared_posts')
+    shared_by_username = models.CharField(max_length=150)
+    caption = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.shared_by.username} shared post {self.original_post.id}"

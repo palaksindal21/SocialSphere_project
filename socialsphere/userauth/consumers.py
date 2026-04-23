@@ -156,3 +156,51 @@ class ChatConsumer(AsyncWebsocketConsumer):
         'shared_post_caption': event.get('shared_post_caption'),
         'shared_post_username': event.get('shared_post_username')
     }))
+        
+
+class NotificationConsumer(AsyncWebsocketConsumer):
+
+    
+    async def connect(self):
+        self.user = self.scope['user']
+        
+        if not self.user.is_authenticated:
+            await self.close()
+            return
+        
+        self.room_name = f'notifications_{self.user.username}'
+        self.room_group_name = self.room_name
+        
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+        
+        await self.accept()
+        print(f"Notification WebSocket connected for {self.user.username}")
+
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+        print(f" Notification WebSocket disconnected for {self.user.username}")
+    
+    async def send_notification(self, event):
+    
+        await self.send(text_data=json.dumps({
+            'type': 'notification',
+            'notification_id': event['notification_id'],
+            'message': event['message'],
+            'notification_type': event['notification_type'],
+            'from_user': event['from_user']
+        }))
+
+
+    async def update_badge(self, event):
+        """Update unread count badge"""
+        await self.send(text_data=json.dumps({
+            'type': 'badge_update',
+            'unread_count': event['unread_count']
+        }))

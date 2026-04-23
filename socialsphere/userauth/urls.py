@@ -42,5 +42,8 @@ urlpatterns = [
     path('share-post-to-chat/', views.share_post_to_chat, name='share_post_to_chat'),
     path('get-friends-list/', views.get_friends_list, name='get_friends_list'),
     path('view-post/<str:post_id>/', views.view_post, name='view_post'),
+    path('get-notifications/', views.get_notifications, name='get_notifications'),
+    path('mark-notification-read/<int:notification_id>/', views.mark_notification_read, name='mark_notification_read'),
+    path('mark-all-notifications-read/', views.mark_all_notifications_read, name='mark_all_notifications_read'),
     
 ]

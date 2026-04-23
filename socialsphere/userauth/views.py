@@ -1173,3 +1173,68 @@ def view_post(request, post_id):
     except Post.DoesNotExist:
         messages.error(request, 'Post not found')
         return redirect('home')
+    
+
+@login_required
+def get_notifications(request):
+    notifications = Notifications.objects.filter(user=request.user).order_by('-created_at')[:30]
+
+    notification_list = []
+    for notif in notifications:
+        notification_list.append({
+            'id': notif.id,
+            'message': notif.message,
+            'type': notif.notification_type,
+            'is_read': notif.is_read,
+            'created_at': notif.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'related_post_id': notif.related_post_id,
+            'from_user': notif.from_user
+        })
+
+    return JsonResponse({'notifications': notification_list,
+        'unread_count': Notifications.objects.filter(user=request.user, is_read=False).count()})
+
+
+@login_required
+def mark_notification_read(request, notification_id):
+    try:
+        notification = Notifications.objects.get(id=notification_id, user=request.user)
+        notification.is_read = True
+        notification.save()
+
+        unread_count = Notifications.objects.filter(user=request.user, is_read=False).count()
+
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'notifications_{request.user.username}',
+            {
+                'type': 'update_badge',
+                'unread_count': unread_count
+            }
+        )
+
+        return JsonResponse({'success': True})
+    except:
+        return JsonResponse({'success': False})
+    
+
+
+@login_required
+def mark_all_notifications_read(request):
+    Notifications.objects.filter(user=request.user, is_read=False).update(is_read=True)
+    
+    # Update badge count via WebSocket
+    from channels.layers import get_channel_layer
+    from asgiref.sync import async_to_sync
+    
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        f'notifications_{request.user.username}',
+        {
+            'type': 'update_badge',
+            'unread_count': 0
+        }
+    )
+    
+    return JsonResponse({'success': True})
+    

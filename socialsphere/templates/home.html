@@ -9,269 +9,6 @@
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-<style>
-    /* Additional styles */
-    .chat-link {
-        color: #ff007f;
-        text-decoration: none;
-        transition: color 0.3s;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .chat-link:hover {
-        color: #ff4d4d;
-    }
-    
-    .message-badge {
-        background: #ff007f;
-        color: white;
-        border-radius: 50%;
-        padding: 2px 6px;
-        font-size: 10px;
-        min-width: 18px;
-        text-align: center;
-    }
-
-    /* Comments section */
-    .comments-section {
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px solid #1c1c1c;
-        max-height: 200px;
-        overflow-y: auto;
-    }
-    
-    .comment-item {
-        font-size: 12px;
-        margin-bottom: 8px;
-        padding: 5px;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.03);
-    }
-    
-    .comment-item strong {
-        color: #ff007f;
-    }
-    
-    .comment-time {
-        font-size: 9px;
-        color: #666;
-        margin-left: 8px;
-    }
-    
-    .view-all-link {
-        display: block;
-        text-align: center;
-        font-size: 11px;
-        color: #ff007f;
-        text-decoration: none;
-        margin-top: 8px;
-        padding: 5px;
-    }
-    
-    .view-all-link:hover {
-        text-decoration: underline;
-    }
-    
-    /* Share Modal - Instagram Style */
-    .share-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.95);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
-    
-    .share-modal-content {
-        background: #0a0a0a;
-        border-radius: 20px;
-        max-width: 500px;
-        width: 90%;
-        max-height: 85vh;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        border: 1px solid #333;
-    }
-    
-    .share-modal-header {
-        padding: 15px 20px;
-        border-bottom: 1px solid #333;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .share-modal-header h3 {
-        font-size: 18px;
-        color: #ff007f;
-    }
-    
-    .share-modal-body {
-        flex: 1;
-        overflow-y: auto;
-        padding: 10px 0;
-    }
-    
-    .friend-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 20px;
-        cursor: pointer;
-        transition: background 0.2s;
-        border-bottom: 1px solid #1a1a1a;
-    }
-    
-    .friend-item:hover {
-        background: #1a1a1a;
-    }
-    
-    .friend-info {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-    
-    .friend-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid #ff007f;
-    }
-    
-    .friend-name {
-        font-weight: 600;
-    }
-    
-    .friend-username {
-        font-size: 12px;
-        color: #888;
-    }
-    
-    .send-btn-chat {
-        background: linear-gradient(45deg, #ff007f, #ff4d4d);
-        border: none;
-        padding: 6px 16px;
-        border-radius: 20px;
-        color: white;
-        cursor: pointer;
-        font-size: 12px;
-        font-weight: 500;
-    }
-    
-    .send-btn-chat:hover {
-        transform: scale(1.02);
-    }
-    
-    .share-caption-input {
-        padding: 15px 20px;
-        border-top: 1px solid #333;
-        border-bottom: 1px solid #333;
-    }
-    
-    .share-caption-input textarea {
-        width: 100%;
-        padding: 12px;
-        background: #1a1a1a;
-        border: 1px solid #333;
-        border-radius: 12px;
-        color: white;
-        font-size: 14px;
-        resize: none;
-        font-family: inherit;
-    }
-    
-    .share-caption-input textarea:focus {
-        outline: none;
-        border-color: #ff007f;
-    }
-    
-    .friend-search {
-        padding: 12px 20px;
-        border-bottom: 1px solid #333;
-    }
-    
-    .friend-search input {
-        width: 100%;
-        padding: 10px 15px;
-        background: #1a1a1a;
-        border: 1px solid #333;
-        border-radius: 25px;
-        color: white;
-        font-size: 14px;
-    }
-    
-    .friend-search input:focus {
-        outline: none;
-        border-color: #ff007f;
-    }
-    
-    .close-modal {
-        cursor: pointer;
-        font-size: 24px;
-        color: #aaa;
-    }
-    
-    .close-modal:hover {
-        color: #ff007f;
-    }
-    
-    .no-friends {
-        text-align: center;
-        padding: 40px;
-        color: #888;
-    }
-    
-    .post-preview {
-        padding: 15px 20px;
-        background: #1a1a1a;
-        margin: 0;
-        display: flex;
-        gap: 12px;
-        border-bottom: 1px solid #333;
-    }
-    
-    .post-preview img {
-        width: 50px;
-        height: 50px;
-        border-radius: 8px;
-        object-fit: cover;
-    }
-    
-    .post-preview p {
-        font-size: 12px;
-        color: #aaa;
-        margin-top: 4px;
-    }
-    
-    .post-preview strong {
-        color: white;
-        font-size: 13px;
-    }
-    
-    .retry-btn {
-        margin-top: 15px;
-        background: #ff007f;
-        border: none;
-        padding: 8px 20px;
-        border-radius: 20px;
-        color: white;
-        cursor: pointer;
-    }
-    
-    .retry-btn:hover {
-        background: #ff4d4d;
-    }
-</style>
 </head>
 
 <body>
@@ -290,40 +27,21 @@
     </form>
 
     <div class="nav-right">
+        <!-- Notification Bell with Dropdown -->
         <div class="notification-icon" onclick="toggleNotifications()">
             <i class="fa fa-bell"></i>
-            {% if pending_requests_count > 0 %}
-            <span class="notification-badge">{{ pending_requests_count }}</span>
-            {% endif %}
+            <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
             
             <div class="notification-dropdown" id="notificationDropdown">
                 <div class="notification-header">
-                    <i class="fas fa-user-plus"></i> Follow Requests
+                    <i class="fas fa-bell"></i> Notifications
+                    <button class="mark-read-btn" onclick="markAllNotificationsRead()">Mark all as read</button>
                 </div>
                 <div id="notificationList">
-                    {% if pending_requests %}
-                        {% for request in pending_requests %}
-                        <div class="notification-item unread" id="notif-{{ request.id }}">
-                            <div class="notification-content">
-                                <div class="notification-text">
-                                    <strong>@{{ request.from_user }}</strong> wants to follow you
-                                </div>
-                                <div class="notification-time">
-                                    {{ request.created_at|timesince }} ago
-                                </div>
-                            </div>
-                            <div class="notification-actions">
-                                <button class="notif-approve-btn" onclick="handleRequestFromNotif({{ request.id }}, 'approve')">✓</button>
-                                <button class="notif-reject-btn" onclick="handleRequestFromNotif({{ request.id }}, 'reject')">✗</button>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-notifications">
-                            <i class="fas fa-inbox"></i>
-                            <p>No follow requests</p>
-                        </div>
-                    {% endif %}
+                    <div class="empty-notifications">
+                        <i class="fas fa-inbox"></i>
+                        <p>Loading notifications...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -610,14 +328,154 @@
     
     const csrftoken = getCookie('csrftoken');
     
-    // ==================== SHARE MODAL VARIABLES ====================
+    // ==================== REAL-TIME NOTIFICATIONS ====================
+    
+    let notificationSocket = null;
+    
+    function connectNotificationWebSocket() {
+        try {
+            notificationSocket = new WebSocket(
+                'ws://' + window.location.host + '/ws/notifications/'
+            );
+            
+            notificationSocket.onopen = function() {
+                console.log(' Notification WebSocket connected');
+            };
+            
+            notificationSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                console.log(' Real-time notification:', data);
+                
+                if (data.type === 'notification') {
+                    // Show toast popup
+                    showToast(data.message, 'info');
+                    // Reload notification list
+                    loadNotifications();
+                } else if (data.type === 'badge_update') {
+                    updateNotificationBadge(data.unread_count);
+                }
+            };
+            
+            notificationSocket.onclose = function() {
+                console.log(' Notification WebSocket disconnected. Reconnecting...');
+                setTimeout(connectNotificationWebSocket, 3000);
+            };
+            
+            notificationSocket.onerror = function(error) {
+                console.error('WebSocket error:', error);
+            };
+        } catch (error) {
+            console.error('WebSocket connection error:', error);
+        }
+    }
+    
+    function updateNotificationBadge(count) {
+        const badge = document.getElementById('notificationBadge');
+        if (badge) {
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    }
+    
+    function loadNotifications() {
+        fetch('/get-notifications/')
+            .then(response => response.json())
+            .then(data => {
+                updateNotificationBadge(data.unread_count);
+                
+                const container = document.getElementById('notificationList');
+                if (container) {
+                    if (data.notifications && data.notifications.length > 0) {
+                        container.innerHTML = '';
+                        data.notifications.forEach(notif => {
+                            const timeAgo = getTimeAgo(notif.created_at);
+                            container.innerHTML += `
+                                <div class="notification-item ${notif.is_read ? '' : 'unread'}" 
+                                     data-id="${notif.id}" 
+                                     data-type="${notif.type}" 
+                                     data-post-id="${notif.related_post_id || ''}"
+                                     data-from-user="${notif.from_user || ''}"
+                                     onclick="handleNotificationClick(this)">
+                                    <div class="notification-content">
+                                        <div class="notification-text">${escapeHtml(notif.message)}</div>
+                                        <div class="notification-time">${timeAgo}</div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        container.innerHTML = `
+                            <div class="empty-notifications">
+                                <i class="fas fa-bell-slash"></i>
+                                <p>No notifications yet</p>
+                                <small>When someone likes, comments, or follows you, you'll see it here</small>
+                            </div>
+                        `;
+                    }
+                }
+            })
+            .catch(error => console.error('Error loading notifications:', error));
+    }
+    
+    function getTimeAgo(timestamp) {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diffSeconds = Math.floor((now - date) / 1000);
+        
+        if (diffSeconds < 60) return 'Just now';
+        if (diffSeconds < 3600) return Math.floor(diffSeconds / 60) + 'm ago';
+        if (diffSeconds < 86400) return Math.floor(diffSeconds / 3600) + 'h ago';
+        return Math.floor(diffSeconds / 86400) + 'd ago';
+    }
+    
+    function handleNotificationClick(element) {
+        const notifId = element.getAttribute('data-id');
+        const type = element.getAttribute('data-type');
+        const postId = element.getAttribute('data-post-id');
+        const fromUser = element.getAttribute('data-from-user');
+        
+        // Mark as read
+        fetch(`/mark-notification-read/${notifId}/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken }
+        });
+        
+        // Redirect based on notification type
+        if (type === 'like' || type === 'comment' || type === 'share') {
+            if (postId) window.location.href = `/view-comments/${postId}/`;
+        } else if (type === 'follow') {
+            window.location.href = `/profile/${fromUser}/`;
+        } else if (type === 'follow_request') {
+            window.location.href = `/pending-requests/`;
+        } else if (type === 'message') {
+            window.location.href = `/chat_list/`;
+        }
+    }
+    
+    function markAllNotificationsRead() {
+        fetch('/mark-all-notifications-read/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadNotifications();
+                showToast('All notifications marked as read', 'success');
+            }
+        });
+    }
+    
+    // ==================== SHARE MODAL FUNCTIONS ====================
     
     let currentSharePostId = null;
     let currentSharePostImage = null;
     let currentSharePostCaption = null;
     let currentSharePostUser = null;
-    
-    // ==================== SHARE MODAL FUNCTIONS ====================
     
     function openShareModal(postId, postUser, postImage, postCaption) {
         currentSharePostId = postId;
@@ -641,17 +499,12 @@
         document.getElementById('shareModal').style.display = 'none';
     }
     
-    // ==================== LOAD FRIENDS FROM FOLLOWERS/FOLLOWING ====================
-    
     function loadFriendsList() {
         const container = document.getElementById('friendsList');
         container.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading friends...</div>';
         
         fetch('/get-friends-list/')
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.friends && data.friends.length > 0) {
                     container.innerHTML = '';
@@ -661,8 +514,8 @@
                                 <div class="friend-info">
                                     <img src="${friend.avatar}" class="friend-avatar" onerror="this.src='/static/images/blankprofile.jpg'">
                                     <div>
-                                        <div class="friend-name">${friend.name || friend.username}</div>
-                                        <div class="friend-username">@${friend.username}</div>
+                                        <div class="friend-name">${escapeHtml(friend.name || friend.username)}</div>
+                                        <div class="friend-username">@${escapeHtml(friend.username)}</div>
                                     </div>
                                 </div>
                                 <button class="send-btn-chat" onclick="shareToChat('${friend.username}')">
@@ -687,7 +540,6 @@
                     <div class="no-friends">
                         <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 15px;"></i>
                         <p>Could not load friends</p>
-                        <small>Make sure you have followed some users</small>
                         <button class="retry-btn" onclick="loadFriendsList()">
                             <i class="fas fa-sync-alt"></i> Retry
                         </button>
@@ -695,8 +547,6 @@
                 `;
             });
     }
-    
-    // ==================== SEARCH FRIENDS ====================
     
     function filterFriends() {
         const searchTerm = document.getElementById('friendSearch').value.toLowerCase();
@@ -710,8 +560,6 @@
             }
         });
     }
-    
-    // ==================== SHARE POST TO CHAT ====================
     
     function shareToChat(username) {
         const caption = document.getElementById('shareCaption').value;
@@ -743,6 +591,13 @@
         });
     }
     
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
     // ==================== TOAST NOTIFICATION ====================
     
     function showToast(message, type) {
@@ -764,6 +619,9 @@
     function toggleNotifications() {
         const dropdown = document.getElementById('notificationDropdown');
         dropdown.classList.toggle('show');
+        if (dropdown.classList.contains('show')) {
+            loadNotifications();
+        }
     }
     
     document.addEventListener('click', function(event) {
@@ -840,7 +698,13 @@
     setInterval(updateTimeDisplay, 60000);
     {% endif %}
     
-    // ==================== OTHER FUNCTIONS ====================
+    // ==================== INITIALIZATION ====================
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        connectNotificationWebSocket();
+        loadNotifications();
+        setInterval(loadNotifications, 30000);
+    });
     
     document.querySelector('input[type="file"]')?.addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
@@ -857,10 +721,6 @@
     document.querySelector('.logout')?.addEventListener('click', function(e) {
         if (!confirm('Are you sure you want to logout?')) e.preventDefault();
     });
-    
-    const style = document.createElement('style');
-    style.textContent = `@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }`;
-    document.head.appendChild(style);
 </script>
 
 </body>
