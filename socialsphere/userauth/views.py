@@ -582,36 +582,77 @@ def settings(request):
             messages.success(request, f"Account is now {'Private' if user_profile.is_private else 'Public'}")
             return redirect('settings')
         
-        # Regular profile update
-        if request.FILES.get('image') is None:
-            image = user_profile.profileimage
-            bio = request.POST['bio']
-            location = request.POST['location']
-
-            user_profile.profileimage = image
-            user_profile.bio = bio
-            user_profile.location = location
-            user_profile.save()
+        bio = request.POST.get('bio', '')
+        location = request.POST.get('location', '')
+        birth_date = request.POST.get('birth_date', '')
         
-        if request.FILES.get('image') is not None:
-            image = request.FILES.get('image')
-            bio = request.POST['bio']
-            location = request.POST['location']
+        if request.FILES.get('image'):
+            user_profile.profileimage = request.FILES.get('image')
 
-            user_profile.profileimage = image
-            user_profile.bio = bio
-            user_profile.location = location
-            user_profile.save()
+        user_profile.bio = bio
+        user_profile.location = location
 
+        if birth_date:
+            try:
+                dob = datetime.strptime(birth_date, '%Y-%m-%d').date()
+                today = timezone.now().date()
+                age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+                
+                if age >= 14:
+                    user_profile.birth_date = dob
+                    messages.success(request, f"Birth date updated! Your age is {age} years.")
+                else:
+                    messages.warning(request, "Birth date not updated. Minimum age requirement is 14 years.")
+            except ValueError:
+                messages.error(request, "Invalid date format. Please use YYYY-MM-DD.")
+    
+        user_profile.save()
+        
+        messages.success(request, 'Profile updated successfully!')
         return redirect('settings')
+
+    pending_requests = FollowRequest.objects.filter(to_user=request.user.username, status='pending')
+    pending_requests_count = pending_requests.count()
+
+    for req in pending_requests:
+        try:
+            req.requester_profile = Profile.objects.filter(user__username=req.from_user).first()
+        except:
+            req.requester_profile = None
+
+    unread_notifications_count = Notifications.objects.filter(user=request.user, is_read=False).count()
+
+    today = timezone.now().date()
+    today_record = DailyTimeSpent.objects.filter(user=request.user.username, date=today).first()
+    today_minutes = today_record.total_minutes if today_record else 0
+    today_hours = today_minutes // 60
+    today_remaining_minutes = today_minutes % 60
     
-    # Get pending requests count for notification badge
-    pending_count = FollowRequest.objects.filter(to_user=request.user.username, status='pending').count()
+    all_records = DailyTimeSpent.objects.filter(user=request.user.username)
+    total_minutes = 0
+    for record in all_records:
+        total_minutes += record.total_minutes
+    total_hours = total_minutes // 60
+    total_remaining_minutes = total_minutes % 60
     
-    return render(request, 'settings.html', {
+    followers_count = FollowersCount.objects.filter(user=request.user.username, is_accepted=True).count()
+    following_count = FollowersCount.objects.filter(follower=request.user.username, is_accepted=True).count()
+    
+    context = {
         'user_profile': user_profile,
-        'pending_count': pending_count
-    })
+        'pending_count': pending_requests_count,
+        'pending_requests': pending_requests,
+        'pending_requests_count': pending_requests_count,
+        'unread_notifications_count': unread_notifications_count,
+        'followers_count': followers_count,
+        'following_count': following_count,
+        'today_hours': today_hours,
+        'today_minutes': today_remaining_minutes,
+        'total_hours': total_hours,
+        'total_minutes': total_remaining_minutes,
+    }
+    
+    return render(request, 'settings.html', context)
 
 # Add comment on post
 @login_required(login_url='signin')
@@ -1237,4 +1278,33 @@ def mark_all_notifications_read(request):
     )
     
     return JsonResponse({'success': True})
+
+
+
+@login_required
+@csrf_exempt
+def delete_account(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        confirmation = data.get('confirmation', '')
+
+        if confirmation != 'DELETE':
+            return JsonResponse({
+                'success': False, 
+                'error': 'Type "DELETE" to confirm account deletion'
+            })
+        
+        profile = request.user.profile
+        profile.delete_account_permanently()
+
+        return JsonResponse({
+            'success': True,
+            'message': 'Account deleted permanently'
+        })
+    
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
     

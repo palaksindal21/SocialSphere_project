@@ -3,118 +3,123 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Comments</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comments - SocialSphere</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/comments.css' %}">
 </head>
+<body>
 
-<body class="bg-gray-100">
-
-<div class="max-w-2xl mx-auto mt-10">
-
-    <!-- 🔹 POST PREVIEW -->
-    <div class="bg-white p-4 rounded-xl shadow mb-5">
-        <h2 class="font-bold text-lg">{{post.user}}</h2>
-        <p class="text-sm text-gray-600">{{post.caption}}</p>
-        <img src="{{post.image.url}}" class="mt-3 rounded-xl">
+<nav class="navbar">
+    <div class="logo" onclick="window.location.href='/'">
+        <i class="fas fa-globe"></i> SocialSphere
     </div>
+    <div class="nav-links">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="#">Explore</a>
+        <a href="#">About</a>
+    </div>
+    <div class="nav-right">
+        <a href="javascript:history.back()" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+    </div>
+</nav>
 
-    <!-- 🔹 ADD COMMENT -->
-    <div class="bg-white p-4 rounded-xl shadow mb-5">
-        <form method="POST" action="{% url 'add_comment' post.id %}" class="flex gap-2">
+<div class="container">
+    
+    <div class="post-preview">
+        <div class="post-header">
+            <img src="{{ post.user.profile.profileimage.url }}" class="post-avatar" alt="{{ post.user }}">
+            <div>
+                <div class="post-user">@{{ post.user }}</div>
+                <div class="post-time">{{ post.created_at|timesince }} ago</div>
+            </div>
+        </div>
+        <div class="post-caption">{{ post.caption }}</div>
+        {% if post.image %}
+        <img src="{{ post.image.url }}" class="post-image" alt="Post image">
+        {% endif %}
+    </div>
+    
+    <div class="add-comment">
+        <form method="POST" action="{% url 'add_comment' post.id %}">
             {% csrf_token %}
-            <input type="text" name="comment_text"
-                   placeholder="Write a comment..."
-                   class="flex-1 px-4 py-2 bg-gray-100 rounded-full">
-            <button class="bg-blue-500 text-white px-4 py-2 rounded-lg">
-                Post
-            </button>
+            <div class="comment-input-wrapper">
+                <img src="{{ request.user.profile.profileimage.url }}" class="comment-avatar" alt="Avatar">
+                <input type="text" name="comment_text" class="comment-input" placeholder="Write a comment..." autocomplete="off">
+                <button type="submit" class="post-comment-btn"><i class="fas fa-paper-plane"></i> Post</button>
+            </div>
         </form>
     </div>
-
-    <!-- 🔹 COMMENTS -->
-    <div class="space-y-4">
-
-        {% for comment in comments %}
-        <div class="bg-white p-4 rounded-xl shadow">
-
-            <!-- COMMENT -->
-            <div class="flex justify-between">
-                <div>
-                    <p class="font-semibold">{{comment.user}}</p>
-                    <p class="text-sm">{{comment.text}}</p>
-                </div>
-
-                <!-- ACTIONS -->
-                <div class="text-xs text-gray-500 space-x-2">
-                    <a href="{% url 'edit_comment' comment.id %}" class="text-blue-500">Edit</a>
-
-                    <a href="{% url 'delete_comment' comment.id %}" class="text-red-500">
-                        Delete
-                    </a>
-                </div>
-            </div>
-
-            <!-- REPLY BUTTON -->
-            <button onclick="toggleReply('{{comment.id}}')"
-                    class="text-xs text-blue-500 mt-2">
-                Reply
-            </button>
-
-            <!-- REPLY FORM -->
-            <form method="POST"
-                  action="{% url 'add_reply' comment.id %}"
-                  id="reply-{{comment.id}}"
-                  class="hidden mt-2 flex gap-2">
-
-                {% csrf_token %}
-                <input type="text" name="reply_text"
-                       placeholder="Write a reply..."
-                       class="flex-1 px-3 py-1 bg-gray-100 rounded-full text-sm">
-
-                <button class="text-blue-500 text-sm">Send</button>
-            </form>
-
-            <!-- 🔹 REPLIES -->
-            <div class="ml-6 mt-3 space-y-2">
-
-                {% for reply in comment.replies_list %}
-                <div class="bg-gray-100 p-2 rounded-lg text-sm">
-
-                    <div class="flex justify-between">
+    
+    <div class="comments-section">
+        <div class="comments-header">
+            <i class="fas fa-comments"></i>
+            <h3>Comments</h3>
+            <span>{{ comments|length }}</span>
+        </div>
+        
+        {% if comments %}
+            {% for comment in comments %}
+            <div class="comment-card" id="comment-{{ comment.id }}">
+                <div class="comment-header">
+                    <div class="comment-user-info">
+                        <img src="{{ comment.user.profile.profileimage.url }}" class="comment-user-avatar" alt="{{ comment.user }}">
                         <div>
-                            <b>{{reply.user}}</b> {{reply.text}}
-                        </div>
-
-                        <div class="text-xs">
-                            <a href="{% url 'delete_comment' reply.id %}" class="text-red-500">
-                                Delete
-                            </a>
+                            <span class="comment-user">@{{ comment.user }}</span>
+                            <span class="comment-time">{{ comment.created_at|timesince }} ago</span>
                         </div>
                     </div>
-
+                    <div class="comment-actions">
+                        {% if comment.user == request.user.username %}
+                        <a href="{% url 'edit_comment' comment.id %}" class="edit-link"><i class="fas fa-edit"></i> Edit</a>
+                        <a href="{% url 'delete_comment' comment.id %}" class="delete-link" onclick="return confirm('Delete this comment?')"><i class="fas fa-trash"></i> Delete</a>
+                        {% endif %}
+                    </div>
                 </div>
-                {% endfor %}
-
+                <div class="comment-text">{{ comment.text }}</div>
+                
+                <button onclick="toggleReplyForm('{{ comment.id }}')" class="reply-btn">
+                    <i class="fas fa-reply"></i> Reply
+                </button>
+                
+                <form method="POST" action="{% url 'add_reply' comment.id %}" id="replyForm-{{ comment.id }}" class="reply-form hidden">
+                    {% csrf_token %}
+                    <input type="text" name="reply_text" class="reply-input" placeholder="Write a reply..." autocomplete="off">
+                    <button type="submit" class="reply-submit"><i class="fas fa-paper-plane"></i> Reply</button>
+                </form>
+                
+                {% if comment.replies_list %}
+                <div class="replies-section">
+                    {% for reply in comment.replies_list %}
+                    <div class="reply-card">
+                        <div class="reply-header">
+                            <span class="reply-user">@{{ reply.user }}</span>
+                            {% if reply.user == request.user.username %}
+                            <a href="{% url 'delete_comment' reply.id %}" class="reply-delete" onclick="return confirm('Delete this reply?')"><i class="fas fa-trash"></i></a>
+                            {% endif %}
+                        </div>
+                        <div class="reply-text">{{ reply.text }}</div>
+                        <div class="comment-time" style="margin-top: 4px;">{{ reply.created_at|timesince }} ago</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
-
-        </div>
-        {% empty %}
-        <p class="text-center text-gray-500">No comments yet</p>
-        {% endfor %}
-
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-comment-slash"></i>
+                <p>No comments yet</p>
+                <small>Be the first to comment on this post!</small>
+            </div>
+        {% endif %}
     </div>
-
 </div>
 
+<footer>
+    <p>© 2026 SocialSphere | Connect • Share • Inspire</p>
+</footer>
 
-<!-- 🔹 JS -->
-<script>
-function toggleReply(id){
-    let form = document.getElementById("reply-" + id);
-    form.classList.toggle("hidden");
-}
-</script>
-
+<script src="{% static 'js/comments.js' %}"></script>
 </body>
 </html>

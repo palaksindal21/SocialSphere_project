@@ -8,223 +8,9 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/profile.css' %}">
-    
-    <style>
-        /* Additional styles */
-        .post-card {
-            position: relative !important;
-            cursor: pointer;
-        }
-        
-        .post-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            pointer-events: auto;
-        }
-        
-        .post-delete-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 100;
-        }
-        
-        .delete-icon {
-            background: rgba(0, 0, 0, 0.7);
-            border: none;
-            color: white;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-        
-        .delete-icon:hover {
-            background: #ed4956;
-            transform: scale(1.1);
-        }
-        
-        .post-delete-btn form,
-        .post-delete-btn button {
-            pointer-events: auto;
-        }
-        
-        .post-card .post-click-area {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            cursor: pointer;
-            z-index: 1;
-        }
-        
-        .post-delete-btn {
-            z-index: 2;
-        }
-        
-        /* Follow Button Styles */
-        .follow-btn {
-            background: linear-gradient(45deg, #e60796, #ff2da0);
-            border: none;
-            padding: 8px 20px;
-            border-radius: 25px;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .follow-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px #e60796;
-        }
-        
-        .unfollow-btn {
-            background: #333;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 25px;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .unfollow-btn:hover {
-            background: #ed4956;
-        }
-        
-        .request-sent-btn {
-            background: #666;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 25px;
-            color: white;
-            cursor: not-allowed;
-            font-weight: bold;
-        }
-        
-        .respond-btn {
-            background: #ff9800;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 25px;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .respond-btn:hover {
-            background: #f57c00;
-            transform: scale(1.05);
-        }
-        
-        /* Private Account Overlay */
-        .private-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-        
-        .private-content {
-            text-align: center;
-            padding: 40px;
-            background: #1a1a1a;
-            border-radius: 20px;
-            max-width: 400px;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .private-content i {
-            font-size: 80px;
-            color: #e60796;
-            margin-bottom: 20px;
-        }
-        
-        .private-content h2 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-        
-        .private-content p {
-            color: #aaa;
-            margin-bottom: 20px;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        
-        /* Privacy Badge */
-        .privacy-badge {
-            display: inline-block;
-            font-size: 11px;
-            padding: 3px 8px;
-            border-radius: 20px;
-            margin-left: 10px;
-            vertical-align: middle;
-        }
-        
-        .privacy-public {
-            background: #10b981;
-            color: white;
-        }
-        
-        .privacy-private {
-            background: #e60796;
-            color: white;
-        }
-        
-        /* Toast Message */
-        .toast-message {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            padding: 12px 24px;
-            border-radius: 10px;
-            color: white;
-            display: none;
-            z-index: 1100;
-            animation: slideIn 0.3s ease;
-        }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-    </style>
 </head>
 <body>
 
-<!-- Navbar -->
 <nav class="navbar">
     <div class="nav-container">
         <div class="logo">
@@ -251,7 +37,6 @@
     </div>
 </nav>
 
-<!-- Private Account Overlay (shown when cannot view content) -->
 {% if not can_view_content and user != user_object %}
 <div class="private-overlay" id="privateOverlay">
     <div class="private-content">
@@ -277,7 +62,6 @@
 
 <div class="container">
     
-    <!-- Profile Header -->
     <div class="profile-header">
         <div class="cover-photo">
             <img src="{% static 'images/cover.jpg' %}" alt="Cover">
@@ -342,7 +126,6 @@
             </div>
         </div>
         
-        <!-- Profile Stats -->
         <div class="profile-stats">
             <div class="stat-item">
                 <div class="stat-number">{{ user_post_length }}</div>
@@ -358,7 +141,6 @@
             </div>
         </div>
         
-        <!-- Profile Tabs -->
         <div class="profile-tabs">
             <button class="tab-btn active" onclick="showTab('posts')">
                 <i class="fas fa-th"></i> Posts
@@ -371,7 +153,6 @@
         </div>
     </div>
     
-    <!-- ========== POSTS TAB ========== -->
     <div id="posts-tab" class="tab-content active">
         {% if can_view_content %}
             {% if user_posts %}
@@ -409,7 +190,6 @@
                 </div>
             {% endif %}
         {% else %}
-            <!-- Content is hidden - private account message shown via overlay -->
             <div style="text-align: center; padding: 60px; color: #aaa;">
                 <i class="fas fa-lock" style="font-size: 64px; margin-bottom: 20px;"></i>
                 <h3>This account is private</h3>
@@ -418,7 +198,6 @@
         {% endif %}
     </div>
     
-    <!-- ========== SAVED POSTS TAB ========== -->
     {% if user_object.username == user.username %}
     <div id="saved-tab" class="tab-content">
         {% if saved_posts %}
@@ -460,7 +239,6 @@
     
 </div>
 
-<!-- Followers Modal -->
 <div id="followersModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -473,7 +251,6 @@
     </div>
 </div>
 
-<!-- Following Modal -->
 <div id="followingModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -486,221 +263,10 @@
     </div>
 </div>
 
-<!-- Toast Message -->
 <div id="toastMessage" class="toast-message"></div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-// Get CSRF token
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-const csrftoken = getCookie('csrftoken');
-
-// Show toast message
-function showToast(message, type) {
-    const toast = document.getElementById('toastMessage');
-    toast.textContent = message;
-    toast.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
-    toast.style.display = 'block';
-    
-    setTimeout(() => {
-        toast.style.display = 'none';
-    }, 3000);
-}
-
-// Tab switching function
-function showTab(tabName) {
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    document.getElementById(tabName + '-tab').classList.add('active');
-    event.target.closest('.tab-btn').classList.add('active');
-}
-
-// Follow user (for public accounts)
-function followUser(username) {
-    fetch(`/follow/${username}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrftoken,
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showToast(`You are now following ${username}`, 'success');
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showToast('Something went wrong', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Network error', 'error');
-    });
-}
-
-// Unfollow user
-function unfollowUser(username) {
-    fetch(`/unfollow/${username}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrftoken,
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showToast(`You unfollowed ${username}`, 'success');
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showToast('Something went wrong', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Network error', 'error');
-    });
-}
-
-// Send follow request (for private accounts)
-function sendFollowRequest(username) {
-    fetch(`/follow/${username}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrftoken,
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showToast(`Follow request sent to ${username}`, 'success');
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showToast('Request already sent or error occurred', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Network error', 'error');
-    });
-}
-
-// Show Followers Modal
-function showFollowersModal(username) {
-    var modal = document.getElementById('followersModal');
-    var modalBody = document.getElementById('followers-list');
-    
-    modalBody.innerHTML = '<div class="loading">Loading followers...</div>';
-    modal.style.display = 'block';
-    
-    fetch(`/get-followers/${username}/`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                modalBody.innerHTML = `<div class="empty-modal">${data.error}</div>`;
-                return;
-            }
-            if (data.followers.length === 0) {
-                modalBody.innerHTML = '<div class="empty-modal">No followers yet</div>';
-                return;
-            }
-            let html = '';
-            data.followers.forEach(follower => {
-                html += `
-                    <div class="modal-user-item">
-                        <img src="${follower.avatar}" alt="${follower.username}">
-                        <div class="modal-user-info">
-                            <strong>@${follower.username}</strong>
-                            <small>${follower.bio || 'No bio'}</small>
-                        </div>
-                        <a href="/profile/${follower.username}" class="view-profile-btn">View Profile</a>
-                    </div>
-                `;
-            });
-            modalBody.innerHTML = html;
-        })
-        .catch(error => {
-            modalBody.innerHTML = '<div class="empty-modal">Error loading followers</div>';
-        });
-}
-
-// Show Following Modal
-function showFollowingModal(username) {
-    var modal = document.getElementById('followingModal');
-    var modalBody = document.getElementById('following-list');
-    
-    modalBody.innerHTML = '<div class="loading">Loading following...</div>';
-    modal.style.display = 'block';
-    
-    fetch(`/get-following/${username}/`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                modalBody.innerHTML = `<div class="empty-modal">${data.error}</div>`;
-                return;
-            }
-            if (data.following.length === 0) {
-                modalBody.innerHTML = '<div class="empty-modal">Not following anyone yet</div>';
-                return;
-            }
-            let html = '';
-            data.following.forEach(following => {
-                html += `
-                    <div class="modal-user-item">
-                        <img src="${following.avatar}" alt="${following.username}">
-                        <div class="modal-user-info">
-                            <strong>@${following.username}</strong>
-                            <small>${following.bio || 'No bio'}</small>
-                        </div>
-                        <a href="/profile/${following.username}" class="view-profile-btn">View Profile</a>
-                    </div>
-                `;
-            });
-            modalBody.innerHTML = html;
-        })
-        .catch(error => {
-            modalBody.innerHTML = '<div class="empty-modal">Error loading following</div>';
-        });
-}
-
-// Close Modal
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
-}
-
-// Close modal when clicking outside
-window.onclick = function(event) {
-    var followersModal = document.getElementById('followersModal');
-    var followingModal = document.getElementById('followingModal');
-    
-    if (event.target == followersModal) {
-        followersModal.style.display = 'none';
-    }
-    if (event.target == followingModal) {
-        followingModal.style.display = 'none';
-    }
-}
-</script>
+<script src="{% static 'js/profile.js' %}"></script>
 
 </body>
 </html>

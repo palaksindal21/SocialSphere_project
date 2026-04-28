@@ -1,6 +1,4 @@
-// =============== SIGNUP PAGE JAVASCRIPT ===============
 
-// Toggle password visibility
 function togglePassword(id) {
     let input = document.getElementById(id);
     let icon = event.target;
@@ -16,7 +14,7 @@ function togglePassword(id) {
     }
 }
 
-// Refresh CAPTCHA using server-side endpoint
+
 function refreshCaptcha() {
     const captchaImage = document.getElementById('captchaImage');
     const captchaHashkey = document.getElementById('captchaHashkey');
@@ -24,27 +22,27 @@ function refreshCaptcha() {
     
     if (!captchaImage || !captchaHashkey || !captchaInput) return;
     
-    // Show loading state on image
+    
     captchaImage.style.opacity = '0.5';
     
     fetch('/captcha/refresh/')
         .then(response => response.json())
         .then(data => {
-            // Update CAPTCHA image and hashkey
+            
             captchaImage.src = data.image_url;
             captchaHashkey.value = data.key;
-            captchaInput.value = ''; // Clear the input field
+            captchaInput.value = ''; 
             captchaImage.style.opacity = '1';
         })
         .catch(error => {
             console.error('Error refreshing CAPTCHA:', error);
             captchaImage.style.opacity = '1';
-            // Fallback: reload the page to get new CAPTCHA
+           
             location.reload();
         });
 }
 
-// Calculate age from birth date
+
 function calculateAge(birthDate) {
     const today = new Date();
     const birth = new Date(birthDate);
@@ -62,7 +60,6 @@ function calculateAge(birthDate) {
     return age;
 }
 
-// Validate age on client side
 function validateAge() {
     const birthDateInput = document.getElementById('birth_date');
     const ageErrorDiv = document.getElementById('ageError');
@@ -95,25 +92,22 @@ function validateAge() {
     }
 }
 
-// Set date input restrictions
+
 function setDateRestrictions() {
     const birthDateInput = document.getElementById('birth_date');
     if (!birthDateInput) return;
     
     const today = new Date();
     
-    // Set max date to 18 years ago (user must be at least 18)
     const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
     const maxDateString = maxDate.toISOString().split('T')[0];
     birthDateInput.setAttribute('max', maxDateString);
     
-    // Set min date to 100 years ago (optional)
     const minDate = new Date(today.getFullYear() - 100, today.getMonth(), today.getDate());
     const minDateString = minDate.toISOString().split('T')[0];
     birthDateInput.setAttribute('min', minDateString);
 }
 
-// Validate password strength
 function validatePasswordStrength(password) {
     const minLength = 8;
     const hasUpperCase = /[A-Z]/.test(password);
@@ -137,12 +131,10 @@ function validatePasswordStrength(password) {
     return { valid: true, message: 'Password is strong' };
 }
 
-// Real-time password strength indicator (optional)
 function addPasswordStrengthIndicator() {
     const passwordInput = document.getElementById('password');
     if (!passwordInput) return;
     
-    // Create strength indicator element
     const strengthDiv = document.createElement('div');
     strengthDiv.className = 'password-strength';
     strengthDiv.style.cssText = 'font-size: 12px; margin-top: -15px; margin-bottom: 15px; padding-left: 10px;';
@@ -163,13 +155,13 @@ function addPasswordStrengthIndicator() {
     });
 }
 
-// Form validation on submit
+
 function setupFormValidation() {
     const form = document.querySelector('form');
     if (!form) return;
     
     form.addEventListener('submit', function(e) {
-        // Validate age
+
         if (!validateAge()) {
             e.preventDefault();
             alert('You must be at least 18 years old to register.');
@@ -177,8 +169,7 @@ function setupFormValidation() {
             if (birthDateInput) birthDateInput.focus();
             return false;
         }
-        
-        // Validate password match
+
         const password = document.getElementById('password');
         const password2 = document.getElementById('password2');
         
@@ -190,8 +181,7 @@ function setupFormValidation() {
             password2.focus();
             return false;
         }
-        
-        // Validate password strength
+
         const passwordStrength = validatePasswordStrength(password.value);
         if (!passwordStrength.valid) {
             e.preventDefault();
@@ -199,8 +189,7 @@ function setupFormValidation() {
             password.focus();
             return false;
         }
-        
-        // Validate CAPTCHA is not empty
+
         const captchaInput = document.getElementById('captchaInput');
         if (captchaInput && !captchaInput.value.trim()) {
             e.preventDefault();
@@ -213,19 +202,16 @@ function setupFormValidation() {
     });
 }
 
-// Auto-refresh CAPTCHA timer (5 minutes)
 let captchaTimeout;
 function resetCaptchaTimer() {
     if (captchaTimeout) clearTimeout(captchaTimeout);
     captchaTimeout = setTimeout(() => {
         refreshCaptcha();
         showTemporaryMessage('CAPTCHA expired. New one generated.', 'info');
-    }, 300000); // 5 minutes
+    }, 300000); 
 }
 
-// Show temporary message
 function showTemporaryMessage(message, type) {
-    // Check if message container exists, if not create one
     let msgContainer = document.getElementById('tempMessage');
     if (!msgContainer) {
         msgContainer = document.createElement('div');
@@ -234,7 +220,6 @@ function showTemporaryMessage(message, type) {
         document.body.appendChild(msgContainer);
     }
     
-    // Set style based on type
     if (type === 'info') {
         msgContainer.style.backgroundColor = '#3b82f6';
     } else if (type === 'success') {
@@ -246,31 +231,25 @@ function showTemporaryMessage(message, type) {
     msgContainer.textContent = message;
     msgContainer.style.display = 'block';
     
-    // Hide after 3 seconds
     setTimeout(() => {
         msgContainer.style.display = 'none';
     }, 3000);
 }
 
-// Initialize all functionality when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Set date restrictions
+   
     setDateRestrictions();
     
-    // Setup form validation
     setupFormValidation();
     
-    // Setup age validation with real-time checking
     const birthDateInput = document.getElementById('birth_date');
     if (birthDateInput) {
         birthDateInput.addEventListener('change', validateAge);
         birthDateInput.addEventListener('input', validateAge);
     }
     
-    // Add password strength indicator
     addPasswordStrengthIndicator();
     
-    // Setup CAPTCHA refresh timer
     const captchaInput = document.getElementById('captchaInput');
     const captchaImage = document.getElementById('captchaImage');
     
@@ -286,18 +265,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Auto-focus on first input
     const firstInput = document.querySelector('.input-group input');
     if (firstInput && !firstInput.value) {
         firstInput.focus();
     }
     
-    // Optional: Load any existing birth_date value (for form errors)
     if (birthDateInput && birthDateInput.value) {
         validateAge();
     }
 });
 
-// Make functions globally available
 window.togglePassword = togglePassword;
 window.refreshCaptcha = refreshCaptcha;

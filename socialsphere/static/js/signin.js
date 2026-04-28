@@ -1,6 +1,4 @@
-// =============== LOGIN PAGE JAVASCRIPT ===============
 
-// Toggle password visibility
 function togglePassword(id) {
     let input = document.getElementById(id);
     let icon = event.target;
@@ -16,7 +14,6 @@ function togglePassword(id) {
     }
 }
 
-// Refresh CAPTCHA using server-side endpoint
 function refreshCaptcha() {
     const captchaImage = document.getElementById('captchaImage');
     const captchaHashkey = document.getElementById('captchaHashkey');
@@ -24,33 +21,31 @@ function refreshCaptcha() {
     
     if (!captchaImage || !captchaHashkey || !captchaInput) return;
     
-    // Show loading state on image
     captchaImage.style.opacity = '0.5';
     
     fetch('/captcha/refresh/')
         .then(response => response.json())
         .then(data => {
-            // Update CAPTCHA image and hashkey
+            
             captchaImage.src = data.image_url;
             captchaHashkey.value = data.key;
-            captchaInput.value = ''; // Clear the input field
+            captchaInput.value = ''; 
             captchaImage.style.opacity = '1';
         })
         .catch(error => {
             console.error('Error refreshing CAPTCHA:', error);
             captchaImage.style.opacity = '1';
-            // Fallback: reload the page to get new CAPTCHA
             location.reload();
         });
 }
 
-// Form validation on submit
+
 function setupFormValidation() {
     const form = document.querySelector('form');
     if (!form) return;
     
     form.addEventListener('submit', function(e) {
-        // Validate username is not empty
+    
         const username = document.getElementById('username');
         if (username && !username.value.trim()) {
             e.preventDefault();
@@ -59,7 +54,7 @@ function setupFormValidation() {
             return false;
         }
         
-        // Validate password is not empty
+        
         const password = document.getElementById('password');
         if (password && !password.value) {
             e.preventDefault();
@@ -68,7 +63,7 @@ function setupFormValidation() {
             return false;
         }
         
-        // Validate CAPTCHA is not empty
+        
         const captchaInput = document.getElementById('captchaInput');
         if (captchaInput && !captchaInput.value.trim()) {
             e.preventDefault();
@@ -81,19 +76,19 @@ function setupFormValidation() {
     });
 }
 
-// Auto-refresh CAPTCHA timer (5 minutes)
+
 let captchaTimeout;
 function resetCaptchaTimer() {
     if (captchaTimeout) clearTimeout(captchaTimeout);
     captchaTimeout = setTimeout(() => {
         refreshCaptcha();
         showTemporaryMessage('CAPTCHA expired. New one generated.', 'info');
-    }, 300000); // 5 minutes
+    }, 300000); 
 }
 
-// Show temporary message
+
 function showTemporaryMessage(message, type) {
-    // Check if message container exists, if not create one
+    
     let msgContainer = document.getElementById('tempMessage');
     if (!msgContainer) {
         msgContainer = document.createElement('div');
@@ -102,7 +97,7 @@ function showTemporaryMessage(message, type) {
         document.body.appendChild(msgContainer);
     }
     
-    // Set style based on type
+    
     if (type === 'info') {
         msgContainer.style.backgroundColor = '#3b82f6';
     } else if (type === 'success') {
@@ -114,27 +109,25 @@ function showTemporaryMessage(message, type) {
     msgContainer.textContent = message;
     msgContainer.style.display = 'block';
     
-    // Hide after 3 seconds
     setTimeout(() => {
         msgContainer.style.display = 'none';
     }, 3000);
 }
 
-// Remember Me functionality
 function setupRememberMe() {
     const rememberCheckbox = document.querySelector('input[name="remember_me"]');
     const usernameInput = document.getElementById('username');
     
     if (!rememberCheckbox || !usernameInput) return;
     
-    // Check if there's a saved username
+    
     const savedUsername = localStorage.getItem('rememberedUsername');
     if (savedUsername) {
         usernameInput.value = savedUsername;
         rememberCheckbox.checked = true;
     }
     
-    // Save username when form is submitted
+    
     const form = document.querySelector('form');
     if (form) {
         form.addEventListener('submit', function() {
@@ -147,27 +140,24 @@ function setupRememberMe() {
     }
 }
 
-// Clear form fields on specific conditions
 function clearPasswordOnError() {
-    // Check if there's an error message
+    
     const errorMessage = document.querySelector('.error-message');
     if (errorMessage && errorMessage.style.display !== 'none') {
         const passwordInput = document.getElementById('password');
         if (passwordInput) {
-            passwordInput.value = ''; // Clear password field on error
+            passwordInput.value = ''; 
         }
     }
 }
 
-// Initialize all functionality when DOM is loaded
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Setup form validation
+
     setupFormValidation();
     
-    // Setup Remember Me functionality
     setupRememberMe();
     
-    // Setup CAPTCHA refresh timer
     const captchaInput = document.getElementById('captchaInput');
     const captchaImage = document.getElementById('captchaImage');
     
@@ -183,16 +173,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Clear password field if there's an error
+
     clearPasswordOnError();
     
-    // Auto-focus on username input
+  
     const usernameInput = document.getElementById('username');
     if (usernameInput) {
         usernameInput.focus();
     }
     
-    // Add enter key support for CAPTCHA
     if (captchaInput) {
         captchaInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -203,6 +192,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Make functions globally available
+
 window.togglePassword = togglePassword;
 window.refreshCaptcha = refreshCaptcha;

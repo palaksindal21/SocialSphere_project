@@ -1,4 +1,4 @@
-/* ========== GLOBAL STYLES - DARK THEME ========== */
+
 * {
     margin: 0;
     padding: 0;
@@ -11,7 +11,7 @@ body {
     color: #e4e6eb;
 }
 
-/* ========== NAVBAR - DARK ========== */
+
 .navbar {
     background: #111111;
     border-bottom: 1px solid #2a2a2a;
@@ -86,14 +86,13 @@ body {
     color: #ff6b6b;
 }
 
-/* ========== MAIN CONTAINER ========== */
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
 }
 
-/* ========== PROFILE HEADER - DARK ========== */
 .profile-header {
     background: #111111;
     border-radius: 12px;
@@ -202,7 +201,6 @@ body {
     gap: 5px;
 }
 
-/* ========== PROFILE STATS - DARK ========== */
 .profile-stats {
     display: flex;
     gap: 40px;
@@ -232,7 +230,6 @@ body {
     color: #8e8e8e;
 }
 
-/* ========== TABS - DARK ========== */
 .profile-tabs {
     display: flex;
     justify-content: center;
@@ -274,7 +271,6 @@ body {
     background: #ff007f;
 }
 
-/* ========== TAB CONTENT ========== */
 .tab-content {
     display: none;
 }
@@ -283,7 +279,7 @@ body {
     display: block;
 }
 
-/* ========== POSTS GRID ========== */
+
 .posts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -342,7 +338,6 @@ body {
     gap: 8px;
 }
 
-/* ========== EMPTY STATE - DARK ========== */
 .empty-state {
     text-align: center;
     padding: 60px 20px;
@@ -382,7 +377,7 @@ body {
     background: #e60073;
 }
 
-/* ========== MODAL - DARK ========== */
+
 .modal {
     display: none;
     position: fixed;
@@ -447,7 +442,7 @@ body {
     overflow-y: auto;
 }
 
-/* Custom scrollbar for modal */
+
 .modal-body::-webkit-scrollbar {
     width: 6px;
 }
@@ -516,7 +511,7 @@ body {
     color: #8e8e8e;
 }
 
-/* ========== LOADING SPINNER ========== */
+
 .loading-spinner {
     display: flex;
     justify-content: center;
@@ -538,7 +533,6 @@ body {
     }
 }
 
-/* ========== TOAST NOTIFICATION - DARK ========== */
 .toast-notification {
     position: fixed;
     bottom: 20px;
@@ -592,7 +586,6 @@ body {
     }
 }
 
-/* ========== FORM ELEMENTS - DARK ========== */
 input, textarea, select {
     background: #1a1a1a;
     border: 1px solid #2a2a2a;
@@ -611,7 +604,7 @@ input::placeholder, textarea::placeholder {
     color: #8e8e8e;
 }
 
-/* ========== BUTTONS - DARK ========== */
+
 button {
     cursor: pointer;
     font-family: inherit;
@@ -645,7 +638,6 @@ button {
     background: #3a3a3a;
 }
 
-/* ========== LINKS ========== */
 a {
     color: #ff007f;
     text-decoration: none;
@@ -655,7 +647,6 @@ a:hover {
     color: #ff4d9e;
 }
 
-/* ========== RESPONSIVE - DARK ========== */
 @media (max-width: 768px) {
     .nav-container {
         flex-direction: column;
@@ -718,7 +709,7 @@ a:hover {
     }
 }
 
-/* ========== ANIMATIONS ========== */
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -734,7 +725,7 @@ a:hover {
     animation: fadeIn 0.3s ease;
 }
 
-/* ========== SCROLLBAR - DARK ========== */
+
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -752,3 +743,214 @@ a:hover {
 ::-webkit-scrollbar-thumb:hover {
     background: #e60073;
 }
+
+ /* Additional styles */
+        .post-card {
+            position: relative !important;
+            cursor: pointer;
+        }
+        
+        .post-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: auto;
+        }
+        
+        .post-delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+        }
+        
+        .delete-icon {
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .delete-icon:hover {
+            background: #ed4956;
+            transform: scale(1.1);
+        }
+        
+        .post-delete-btn form,
+        .post-delete-btn button {
+            pointer-events: auto;
+        }
+        
+        .post-card .post-click-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            cursor: pointer;
+            z-index: 1;
+        }
+        
+        .post-delete-btn {
+            z-index: 2;
+        }
+        
+        /* Follow Button Styles */
+        .follow-btn {
+            background: linear-gradient(45deg, #e60796, #ff2da0);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .follow-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #e60796;
+        }
+        
+        .unfollow-btn {
+            background: #333;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .unfollow-btn:hover {
+            background: #ed4956;
+        }
+        
+        .request-sent-btn {
+            background: #666;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            color: white;
+            cursor: not-allowed;
+            font-weight: bold;
+        }
+        
+        .respond-btn {
+            background: #ff9800;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .respond-btn:hover {
+            background: #f57c00;
+            transform: scale(1.05);
+        }
+        
+        /* Private Account Overlay */
+        .private-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .private-content {
+            text-align: center;
+            padding: 40px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            max-width: 400px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .private-content i {
+            font-size: 80px;
+            color: #e60796;
+            margin-bottom: 20px;
+        }
+        
+        .private-content h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .private-content p {
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Privacy Badge */
+        .privacy-badge {
+            display: inline-block;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        
+        .privacy-public {
+            background: #10b981;
+            color: white;
+        }
+        
+        .privacy-private {
+            background: #e60796;
+            color: white;
+        }
+        
+        /* Toast Message */
+        .toast-message {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 12px 24px;
+            border-radius: 10px;
+            color: white;
+            display: none;
+            z-index: 1100;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }

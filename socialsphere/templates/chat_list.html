@@ -6,167 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Messages - SocialSphere</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: linear-gradient(135deg, #0a0a0a 0%, #000000 100%);
-            font-family: 'Segoe UI', sans-serif;
-            color: #ffffff;
-            min-height: 100vh;
-        }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #1a1a1a; }
-        ::-webkit-scrollbar-thumb { background: #ff007f; border-radius: 4px; }
-        
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 48px;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(12px);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255, 0, 127, 0.15);
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 24px;
-            font-weight: 700;
-            cursor: pointer;
-            background: linear-gradient(135deg, #ff007f, #ff4d4d);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .logo i { background: none; -webkit-background-clip: unset; color: #ff007f; }
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: none;
-            padding: 8px 18px;
-            border-radius: 30px;
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-        .nav-btn:hover { background: rgba(255, 0, 127, 0.2); color: #ff007f; }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 80px 24px 40px;
-        }
-        .page-header { margin-bottom: 32px; }
-        .page-header h1 { font-size: 28px; background: linear-gradient(135deg, #ffffff, #ff007f); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .page-header p { color: #888; font-size: 14px; margin-top: 6px; }
-        
-        /* People to Connect */
-        .people-section { margin-bottom: 40px; }
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .section-header h3 { font-size: 18px; color: #ff007f; }
-        .refresh-btn { background: none; border: none; color: #ff007f; cursor: pointer; font-size: 12px; }
-        .people-list {
-            display: flex;
-            gap: 16px;
-            overflow-x: auto;
-            padding: 8px 4px;
-        }
-        .person-card {
-            min-width: 140px;
-            text-align: center;
-            background: rgba(25, 25, 25, 0.8);
-            border-radius: 16px;
-            padding: 16px 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .person-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255, 0, 127, 0.3);
-            background: rgba(35, 35, 35, 0.9);
-        }
-        .person-avatar {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 10px;
-            border: 2px solid #ff007f;
-        }
-        .person-username { font-size: 14px; font-weight: 600; margin-bottom: 5px; }
-        .person-bio { font-size: 10px; color: #888; margin-bottom: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .message-btn {
-            background: linear-gradient(45deg, #ff007f, #ff4d4d);
-            border: none;
-            padding: 6px 14px;
-            border-radius: 20px;
-            color: white;
-            font-size: 11px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .message-btn:hover { transform: scale(1.05); }
-        
-        /* Chat List */
-        .chat-list {
-            background: rgba(18, 18, 18, 0.8);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            overflow: hidden;
-        }
-        .chat-item {
-            display: flex;
-            align-items: center;
-            padding: 18px 24px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .chat-item:hover { background: rgba(255, 0, 127, 0.08); transform: translateX(4px); }
-        .chat-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ff007f, #ff4d4d);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 16px;
-        }
-        .chat-info { flex: 1; }
-        .chat-name { font-weight: 600; font-size: 16px; margin-bottom: 6px; }
-        .chat-last-message { font-size: 13px; color: #999; }
-        .chat-time { font-size: 11px; color: #666; }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 40px;
-            background: rgba(18, 18, 18, 0.6);
-            border-radius: 20px;
-        }
-        .empty-state i { font-size: 64px; color: #ff007f; opacity: 0.5; margin-bottom: 20px; }
-        
-        @media (max-width: 768px) {
-            .navbar { padding: 12px 20px; }
-            .container { padding: 70px 16px 30px; }
-            .person-card { min-width: 120px; padding: 12px 8px; }
-            .person-avatar { width: 55px; height: 55px; }
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/chat.css' %}">
 </head>
 <body>
 
@@ -183,7 +23,7 @@
         <p>Chat with your friends on SocialSphere</p>
     </div>
 
-    <!-- People to Connect Section -->
+   
     <div class="people-section">
         <div class="section-header">
             <h3><i class="fas fa-user-plus"></i> People to Connect</h3>
@@ -196,7 +36,7 @@
         </div>
     </div>
 
-    <!-- Your Conversations -->
+    
     <h3 style="margin-bottom: 16px;"><i class="fas fa-history"></i> Your Conversations</h3>
     
     <div class="chat-list">
@@ -227,89 +67,7 @@
     </div>
 </div>
 
-<script>
-    // Get CSRF token
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    function loadPeopleToConnect() {
-        fetch('/get-people-to-connect/')
-            .then(response => response.json())
-            .then(data => {
-                const container = document.getElementById('peopleList');
-                if (data.users && data.users.length > 0) {
-                    container.innerHTML = '';
-                    data.users.forEach(user => {
-                        container.innerHTML += `
-                            <div class="person-card" onclick="startChat('${user.username}')">
-                                <img src="${user.avatar}" class="person-avatar" onerror="this.src='/static/images/blankprofile.jpg'">
-                                <div class="person-username">@${user.username}</div>
-                                <div class="person-bio">${user.bio.substring(0, 30)}</div>
-                                <button class="message-btn" onclick="event.stopPropagation(); startChat('${user.username}')">
-                                    <i class="fas fa-comment"></i> Message
-                                </button>
-                            </div>
-                        `;
-                    });
-                } else {
-                    container.innerHTML = `<div style="text-align: center; width: 100%; padding: 30px; color: #888;">
-                        <i class="fas fa-users"></i>
-                        <p>No suggestions available</p>
-                        <small>Follow more people to connect</small>
-                    </div>`;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('peopleList').innerHTML = `<div style="text-align: center; width: 100%; padding: 30px; color: #ef4444;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <p>Error loading suggestions</p>
-                </div>`;
-            });
-    }
-
-    function startChat(username) {
-        // First create/get chat room
-        fetch('/get-or-create-chat/', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username: username })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Redirect to chat room
-                window.location.href = '/chat/' + username + '/';
-            } else {
-                alert('Error: ' + (data.error || 'Cannot start chat'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Network error. Please try again.');
-        });
-    }
-
-    // Load people when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        loadPeopleToConnect();
-    });
-</script>
+<script src="{% static 'js/chat.js' %}"></script>
 
 </body>
 </html>

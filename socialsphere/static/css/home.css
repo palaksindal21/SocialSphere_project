@@ -5,7 +5,7 @@ body {
     color: white;
 }
 
-/* NAVBAR */
+
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -101,7 +101,7 @@ body {
     color: #ff4d4d;
 }
 
-/* LAYOUT */
+
 .container {
     display: grid;
     grid-template-columns: 25% 50% 25%;
@@ -123,7 +123,7 @@ body {
     box-shadow: 0 0 20px rgba(255,0,128,0.5);
 }
 
-/* PROFILE CARD */
+
 .profile-img {
     width: 80px;
     height: 80px;
@@ -170,7 +170,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* LINKS */
+
 .links p {
     margin: 12px 0;
     cursor: pointer;
@@ -245,7 +245,7 @@ body {
     transform: scale(1.05);
 }
 
-/* COMMENT */
+
 .comment-box {
     display: flex;
     margin-top: 10px;
@@ -280,7 +280,7 @@ body {
     transform: scale(1.05);
 }
 
-/* CREATE POST */
+
 .create-top {
     display: flex;
     gap: 10px;
@@ -336,7 +336,7 @@ body {
     transform: scale(1.05);
 }
 
-/* SUGGESTION */
+
 .suggestion {
     display: flex;
     justify-content: space-between;
@@ -385,7 +385,7 @@ body {
     color: #ff4d4d;
 }
 
-/* RESPONSIVE */
+
 @media (max-width: 1024px) {
     .container {
         grid-template-columns: 30% 70%;
@@ -427,7 +427,7 @@ body {
     }
 }
 
-/* SCROLLBAR */
+
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -602,7 +602,7 @@ body {
         color: #ff007f;
     }
     
-    /* Notification Dropdown Styles */
+    
     .notification-icon {
         position: relative;
         cursor: pointer;
@@ -718,7 +718,7 @@ body {
         color: white;
     }
     
-    /* Time Tracker Card Styles */
+    
     .time-tracker-card {
         margin-bottom: 20px;
     }
@@ -812,7 +812,7 @@ body {
         margin-bottom: 10px;
     }
     
-    /* Activity Card Styles */
+   
     .activity-card {
         margin-bottom: 20px;
     }
@@ -866,7 +866,7 @@ body {
         color: white;
     }
     
-    /* Privacy Badge */
+    
     .privacy-badge {
         display: inline-block;
         font-size: 10px;
@@ -914,7 +914,7 @@ body {
         }
     }
 
-    /* Additional styles */
+    
     .chat-link {
         color: #ff007f;
         text-decoration: none;
@@ -938,7 +938,7 @@ body {
         text-align: center;
     }
 
-    /* Comments section */
+    
     .comments-section {
         margin-top: 10px;
         padding-top: 10px;
@@ -979,7 +979,7 @@ body {
         text-decoration: underline;
     }
     
-    /* Notification Dropdown Styles */
+    
     .notification-icon {
         position: relative;
         cursor: pointer;
@@ -1106,7 +1106,7 @@ body {
         margin-bottom: 15px;
     }
     
-    /* Share Modal Styles */
+    
     .share-modal {
         position: fixed;
         top: 0;
@@ -1303,7 +1303,7 @@ body {
         background: #ff4d4d;
     }
     
-    /* Toast Animation */
+   
     @keyframes slideIn {
         from {
             transform: translateX(100%);

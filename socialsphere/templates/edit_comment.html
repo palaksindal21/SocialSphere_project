@@ -3,38 +3,58 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit Comment</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Comment - SocialSphere</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/comments.css' %}">
 </head>
+<body>
 
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-
-<div class="bg-white p-6 rounded-xl shadow w-full max-w-md">
-
-    <h2 class="text-xl font-bold mb-4">Edit Comment</h2>
-
+<div class="edit-card">
+   
+    <div class="edit-header">
+        <i class="fas fa-edit"></i>
+        <h2>Edit Comment</h2>
+    </div>
+    
+    <div class="post-preview">
+        <div class="post-preview-label">
+            <i class="fas fa-image"></i> Post
+        </div>
+        <div class="post-preview-text">
+            "{{ post.caption|truncatechars:80 }}"
+        </div>
+    </div>
+    
     <form method="POST">
         {% csrf_token %}
-
-        <textarea name="comment_text"
-                  class="w-full p-3 border rounded-lg"
-                  rows="3">{{comment.text}}</textarea>
-
-        <div class="flex justify-between mt-4">
-            <a href="{% url 'view_comments' post.id %}"
-               class="text-gray-500">
-               Cancel
+        
+        <div class="form-group">
+            <label><i class="fas fa-comment"></i> Your Comment</label>
+            <textarea name="comment_text" 
+                      class="comment-input" 
+                      rows="4" 
+                      maxlength="800"
+                      placeholder="Edit your comment...">{{ comment.text }}</textarea>
+            <div class="char-count">
+                <span id="charCount">{{ comment.text|length }}</span> / 800 characters
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="{% url 'view_comments' post.id %}" class="cancel-btn">
+                <i class="fas fa-times"></i> Cancel
             </a>
-
-            <button class="bg-blue-500 text-white px-4 py-2 rounded-lg">
-                Update
+            <button type="submit" class="update-btn">
+                <i class="fas fa-save"></i> Update Comment
             </button>
         </div>
-
+        
     </form>
-
+    
 </div>
+
+<script src="{% static 'js/comments.js' %}"></script>
 
 </body>
 </html>

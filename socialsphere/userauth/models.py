@@ -116,6 +116,43 @@ class Profile(models.Model):
         daily_record.total_minutes += minutes
         daily_record.save()
 
+
+    def delete_account_permanently(self):
+        username = self.user.username
+        posts = Post.objects.filter(user=username)
+
+        for post in posts:
+            if post.image:
+                post.image.delete(save=False)  # Delete image file
+            post.delete()
+
+        Comment.objects.filter(user=username).delete()
+        LikePost.objects.filter(username=username).delete()
+        SavedPost.objects.filter(user=username).delete()
+        FollowersCount.objects.filter(follower=username).delete()
+        FollowersCount.objects.filter(user=username).delete()
+        FollowRequest.objects.filter(from_user=username).delete()
+        FollowRequest.objects.filter(to_user=username).delete()
+
+        chat_rooms = self.user.chat_rooms.all()
+        for room in chat_rooms:
+            room.participants.remove(self.user)
+            if room.participants.count() == 0:
+                room.delete()
+
+        Notifications.objects.filter(user=self.user).delete()
+        UserSession.objects.filter(user=username).delete()
+        DailyTimeSpent.objects.filter(user=username).delete()
+        ActiveSession.objects.filter(user=self.user).delete()
+
+        if self.profileimage and self.profileimage.name != 'blankprofile.jpg':
+            self.profileimage.delete(save=False)
+
+        self.delete()
+        self.user.delete()
+        return True
+    
+
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     user = models.CharField(max_length=100)

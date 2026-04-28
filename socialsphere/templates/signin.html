@@ -8,55 +8,8 @@
 
     <link href="{% static 'assets/images/favicon.png' %}" rel="icon">
     <link rel="stylesheet" href="{% static 'css/auth.css' %}">
-
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <style>
-        .captcha-image {
-            cursor: pointer;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            height: 50px;
-        }
-        
-        .refresh-captcha {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            margin-left: 10px;
-            color: #4a5568;
-        }
-        
-        .refresh-captcha:hover {
-            color: #3182ce;
-        }
-        
-        .captcha-box {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .error-message, .success-message {
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            text-align: center;
-            display: none;
-        }
-        
-        .error-message {
-            background: #ef4444;
-            color: white;
-        }
-        
-        .success-message {
-            background: #10b981;
-            color: white;
-        }
-    </style>
 </head>
 
 <body>
@@ -84,7 +37,6 @@
             <p>Login to continue</p>
         </div>
 
-        <!-- Display Django messages -->
         {% if messages %}
             {% for message in messages %}
                 <div class="{% if message.tags == 'error' %}error-message{% elif message.tags == 'success' %}success-message{% else %}error-message{% endif %}" 
@@ -94,11 +46,9 @@
             {% endfor %}
         {% endif %}
 
-        <!-- Regular form submission (no AJAX) -->
         <form method="POST" action="{% url 'signin' %}">
             {% csrf_token %}
 
-            <!-- USERNAME -->
             <div class="input-group">
                 <i class="fas fa-user"></i>
                 <input type="text" name="username" id="username"
@@ -137,7 +87,6 @@
                 <label class="checkbox-label">
                     <input type="checkbox" name="remember_me"> Remember Me
                 </label>
-                <a href="#" class="forgot-link">Forgot Password?</a>
             </div>
 
             <button type="submit" class="auth-btn">
@@ -159,71 +108,7 @@
     <p>© 2026 SocialSphere</p>
 </footer>
 
-<script>
-
-// Toggle password visibility
-function togglePassword(id) {
-    let input = document.getElementById(id);
-    let icon = event.target;
-    
-    if (input.type === "password") {
-        input.type = "text";
-        icon.classList.remove("fa-eye-slash");
-        icon.classList.add("fa-eye");
-    } else {
-        input.type = "password";
-        icon.classList.remove("fa-eye");
-        icon.classList.add("fa-eye-slash");
-    }
-}
-
-// Refresh CAPTCHA using server-side endpoint
-function refreshCaptcha() {
-    const captchaImage = document.getElementById('captchaImage');
-    const captchaHashkey = document.getElementById('captchaHashkey');
-    const captchaInput = document.getElementById('captchaInput');
-    
-    // Show loading state on image
-    captchaImage.style.opacity = '0.5';
-    
-    fetch('/captcha/refresh/')
-        .then(response => response.json())
-        .then(data => {
-            // Update CAPTCHA image and hashkey
-            captchaImage.src = data.image_url;
-            captchaHashkey.value = data.key;
-            captchaInput.value = ''; // Clear the input field
-            captchaImage.style.opacity = '1';
-        })
-        .catch(error => {
-            console.error('Error refreshing CAPTCHA:', error);
-            captchaImage.style.opacity = '1';
-            // Fallback: reload the page to get new CAPTCHA
-            location.reload();
-        });
-}
-
-// Optional: Auto-refresh CAPTCHA after 5 minutes
-let captchaTimeout;
-function resetCaptchaTimer() {
-    if (captchaTimeout) clearTimeout(captchaTimeout);
-    captchaTimeout = setTimeout(() => {
-        refreshCaptcha();
-    }, 300000); // 5 minutes
-}
-
-// Reset timer on user interaction
-document.getElementById('captchaInput').addEventListener('focus', resetCaptchaTimer);
-document.getElementById('captchaImage').addEventListener('click', function() {
-    refreshCaptcha();
-    resetCaptchaTimer();
-});
-
-// Initial timer start
-resetCaptchaTimer();
-
-</script>
-
+<script src="{% static 'js/signin.js' %}"></script>
 </body>
 </html> 
 

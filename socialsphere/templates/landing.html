@@ -4,88 +4,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SocialSphere</title>
+    <title>SocialSphere - Connect, Share, Inspire</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
 </head>
 
 <body>
 
-
 <nav>
-    <h2 class="logo">SocialSphere</h2>
+    <h2 class="logo" onclick="window.location.href='/'">SocialSphere</h2>
     <div class="nav-links">
         <a href="{% url 'home' %}">Home</a>
-        <a href="#">Features</a>
-        <a href="#">About</a>
-        <a href="#">Contact</a>
+        <a href="#features">Features</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
     </div>
     <div class="auth">
-        <button>Login</button>
-        <button>Sign Up</button>
+        <button onclick="window.location.href='{% url 'signin' %}'">Login</button>
+        <button onclick="window.location.href='{% url 'signup' %}'">Sign Up</button>
     </div>
 </nav>
-
 
 <section class="hero">
     <h1>Connect, Share, <span>Inspire</span></h1>
     <p>SocialSphere is where creativity meets community. Share your moments, connect with like-minded people, and build your digital presence.</p>
     <div class="hero-btns">
-        <button class="primary">Get Started</button>
-        <button class="secondary">Learn More</button>
+        <button class="primary" onclick="window.location.href='{% url 'signup' %}'">Get Started</button>
+        <button class="secondary" onclick="window.location.href='#features'">Learn More</button>
     </div>
 </section>
 
-
-<section class="features">
+<section id="features" class="features">
     <h2>Our Features</h2>
-
     <div class="feature-container">
         <div class="card">
             <i class="fas fa-share-alt"></i>
             <h3>Share Moments</h3>
-            <p>Post photos and videos easily.</p>
+            <p>Post photos and videos easily with your friends and followers.</p>
         </div>
-
         <div class="card">
             <i class="fas fa-comments"></i>
-            <h3>Chat</h3>
-            <p>Real-time messaging system.</p>
+            <h3>Real-time Chat</h3>
+            <p>Instant messaging with friends and real-time notifications.</p>
         </div>
-
         <div class="card">
             <i class="fas fa-chart-line"></i>
-            <h3>Analytics</h3>
-            <p>Track your growth.</p>
+            <h3>Track Activity</h3>
+            <p>Monitor your engagement and track your growth over time.</p>
         </div>
     </div>
 </section>
 
-<!-- CTA -->
 <section class="cta-box">
     <div class="cta-content">
-        <h2>
-            Ready to Join the <span>SocialSphere</span>?
-        </h2>
-        <p>
-            Start your journey today and become part of the fastest-growing creative community.
-        </p>
-
+        <h2>Ready to Join the <span>SocialSphere</span>?</h2>
+        <p>Start your journey today and become part of the fastest-growing creative community.</p>
         <div class="cta-buttons">
-            <button class="btn-primary">
+            <button class="btn-primary" onclick="window.location.href='{% url 'signup' %}'">
                 Get Started Free →
             </button>
-
-            <button class="btn-outline">
+            <button class="btn-outline" onclick="window.location.href='#features'">
                 ▶ Learn More
             </button>
         </div>
     </div>
 </section>
-<!-- FOOTER -->
+
 <footer>
     <p>© 2026 SocialSphere. All rights reserved.</p>
 </footer>
 
+<script src="{% static 'js/home.js' %}"></script>
 </body>
 </html>

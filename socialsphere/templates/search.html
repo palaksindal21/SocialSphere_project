@@ -4,94 +4,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search</title>
-
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Search - SocialSphere</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/search.css' %}">
 </head>
+<body>
+<nav class="navbar">
+    <div class="logo" onclick="window.location.href='/'">
+        <i class="fas fa-globe"></i> SocialSphere
+    </div>
+    <div class="nav-links">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="#">Explore</a>
+        <a href="#">About</a>
+    </div>
+    <div class="nav-right">
+        <a href="{% url 'chat_list' %}" style="color: white;">
+            <i class="fas fa-comment"></i>
+        </a>
+        <img src="{{ user_profile.profileimage.url }}" class="nav-avatar" alt="Avatar" onclick="window.location.href='{% url 'profile' request.user.username %}'">
+    </div>
+</nav>
 
-<body class="bg-gray-100">
-
-<!--  NAVBAR -->
-<div class="bg-white shadow p-4 flex justify-between items-center">
-
-    <a href="{% url 'home' %}" class="text-xl font-bold">
-        SocialSphere
-    </a>
-
-    <!-- SEARCH -->
-    <form action="{% url 'search' %}" method="POST" class="flex gap-2">
-        {% csrf_token %}
-        <input type="text" name="username"
-               placeholder="Search username..."
-               class="px-4 py-2 border rounded-full w-64">
-        <button class="bg-blue-500 text-white px-4 py-2 rounded-full">
-            Search
-        </button>
-    </form>
-
-    <!-- PROFILE -->
-    <a href="{% url 'profile' request.user.username %}">
-        <img src="{{user_profile.profileimage.url}}"
-             class="w-10 h-10 rounded-full">
-    </a>
-
-</div>
-
-
-<!-- SEARCH RESULTS -->
-<div class="max-w-3xl mx-auto mt-6">
-
-    <h2 class="text-lg font-semibold mb-4">
-        Results for "{{username}}"
-    </h2>
-
-    {% if username_profile_list %}
+<div class="search-container">
     
-        {% for users in username_profile_list %}
-        <div class="bg-white p-4 rounded-xl shadow mb-4 flex items-center justify-between">
-
-            <!-- LEFT SIDE -->
-            <div class="flex items-center gap-4">
-
-                <!-- PROFILE IMAGE (FIXED SIZE) -->
-                <img src="{{users.profileimage.url}}"
-                     class="w-14 h-14 rounded-full object-cover">
-
-                <!-- USER INFO -->
-                <div>
-                    <a href="{% url 'profile' users.user %}"
-                       class="font-bold text-sm">
-                        @{{users.user}}
-                    </a>
-
-                    <p class="text-xs text-gray-500">
-                        {{users.location}}
-                    </p>
-
-                    <p class="text-xs text-gray-600 truncate max-w-xs">
-                        {{users.bio}}
-                    </p>
-                </div>
-
+    <div class="search-form">
+        <form action="{% url 'search' %}" method="POST">
+            {% csrf_token %}
+            <div class="search-wrapper">
+                <input type="text" name="username" class="search-input" 
+                       placeholder="Search by username..." value="{{ username }}" autocomplete="off">
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
             </div>
-
-            <!-- RIGHT BUTTON -->
-            <a href="{% url 'profile' users.user %}"
-               class="bg-blue-500 text-white px-4 py-1 rounded-lg text-sm">
-                View
+        </form>
+    </div>
+   
+    <div class="results-header">
+        <h2><i class="fas fa-search"></i> Search Results</h2>
+        {% if username %}
+        <p>Showing results for "<strong>{{ username }}</strong>"</p>
+        {% endif %}
+    </div>
+    
+    {% if username_profile_list %}
+        {% for users in username_profile_list %}
+        <div class="user-card">
+            <div class="user-info">
+                <img src="{{ users.profileimage.url }}" class="user-avatar" alt="{{ users.user }}">
+                <div class="user-details">
+                    <div class="user-username">
+                        <a href="{% url 'profile' users.user %}">@{{ users.user }}</a>
+                    </div>
+                    <div class="user-location">
+                        <i class="fas fa-map-marker-alt"></i> {{ users.location|default:"Location not set" }}
+                    </div>
+                    <div class="user-bio">
+                        {{ users.bio|default:"No bio yet"|truncatechars:60 }}
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'profile' users.user %}" class="view-btn">
+                <i class="fas fa-user"></i> View Profile
             </a>
-
         </div>
         {% endfor %}
-
     {% else %}
-        <p class="text-gray-500 text-center mt-10">
-            No users found 
-        </p>
+        <div class="empty-state">
+            <i class="fas fa-user-slash"></i>
+            <h3>No users found</h3>
+            <p>Try searching with a different username</p>
+        </div>
     {% endif %}
-
+    
 </div>
 
+<footer>
+    <p>© 2026 SocialSphere | Connect • Share • Inspire</p>
+</footer>
+
+<script src="{% static 'js/search.js' %}"></script>
 </body>
 </html>
